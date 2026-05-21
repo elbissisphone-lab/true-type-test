@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>True Type Test | Personality Assessment</title>
     <link rel="icon" type="image/png" href="logo.png">
-    <link rel="stylesheet" href="../mbti.css">
+    <link rel="stylesheet" href="mbti.css">
     <style>
         /* Exact Re-implementation of MBTI Test UI with Tournament Logic */
         body {
@@ -148,7 +148,6 @@
             font-size: 0.85rem;
             text-align: center;
             color: var(--light);
-            font-family: 'Roboto', sans-serif;
         }
 
         /* Loader Overlay */
@@ -300,78 +299,61 @@
         <div class="loader-text">Processing Results...</div>
     </div>
 
-    <script src="../shared.js"></script>
+    <script src="shared.js"></script>
     <script>
         // --- DATA POOLS ---
         const MBTI_POOL = {
-            Te: ["I enjoy organizing and structuring tasks efficiently.", "I prefer clear, logical systems over abstract ideas.", "I often take charge in group settings to ensure things get done.", "I enjoy creating systems to improve productivity.", "I prioritize efficiency and results over personal feelings.", "I feel satisfied when I can check tasks off a to-do list.", "I prefer to rely on data and facts rather than intuition.", "I like to set measurable goals and track my progress."],
-            Ti: ["I enjoy breaking down complex problems into smaller, logical parts.", "I often question the validity of rules and systems.", "I prefer to understand the underlying principles behind ideas.", "I value precision and accuracy in my reasoning.", "I enjoy exploring abstract theories and concepts.", "I prefer to rely on my own logic rather than external opinions.", "I often analyze my own thought processes to improve them.", "I enjoy debating ideas to test their logical consistency."],
-            Fe: ["I prioritize harmony and avoid conflict in social situations.", "I easily pick up on the emotions of those around me.", "I enjoy helping others and making them feel comfortable.", "I feel responsible for maintaining a positive atmosphere.", "I often adjust my behavior to fit the mood of the group.", "I often consider how my actions will affect others emotionally.", "I enjoy working in teams and collaborating with others.", "I feel uncomfortable when there is tension or conflict in a group."],
-            Fi: ["I make decisions based on my personal values and feelings.", "I value authenticity and being true to myself.", "I feel deeply connected to my personal beliefs and principles.", "I often prioritize what feels right to me over what is logical.", "I enjoy exploring my own identity and what makes me unique.", "I often reflect on my emotions and inner experiences.", "I feel strongly about standing up for what I believe in.", "I enjoy creative activities that allow me to express my inner self."],
-            Ne: ["I enjoy brainstorming and exploring new possibilities.", "I often make connections between seemingly unrelated ideas.", "I get excited about starting new projects.", "I often see multiple ways to approach a problem.", "I enjoy discussions on abstract concepts and future potential.", "I feel energized when I can explore new ideas and perspectives.", "I often come up with creative solutions to problems.", "I enjoy imagining different scenarios and outcomes."],
-            Ni: ["I often have sudden insights or 'aha' moments.", "I focus on long-term goals and future outcomes.", "I enjoy finding deeper meanings in events and experiences.", "I often trust my gut feelings when making decisions.", "I often notice patterns and connections that others miss.", "I feel drawn to understanding the underlying meaning of things.", "I enjoy planning for the future and setting long-term goals.", "I often feel like I can predict how things will turn out."],
-            Se: ["I live in the moment and enjoy sensory experiences.", "I notice details in my environment that others miss.", "I enjoy physical activities and hands-on tasks.", "I feel energized when I can engage with the world around me.", "I enjoy trying new foods, music, and physical sensations.", "I often act on impulse and go with the flow.", "I feel most alive when I am fully immersed in the present.", "I enjoy activities that require quick reflexes and coordination."],
-            Si: ["I rely on past experiences to guide my decisions.", "I enjoy routines and familiar environments.", "I have a strong memory for details and facts.", "I feel most comfortable when things are predictable and stable.", "I feel a strong connection to traditions and customs.", "I enjoy reminiscing about past experiences and memories.", "I often compare new experiences to past ones.", "I feel grounded when I can rely on familiar routines."]
+            Te: ["I enjoy organizing and structuring tasks with efficiency.", "I prefer clear logical systems over abstract ideas.", "I often take the lead in groups to ensure things get done.", "I enjoy creating systems to improve productivity.", "I prioritize efficiency and results over personal feelings.", "I feel satisfied when I can check off tasks from my to-do list.", "I prefer relying on data and facts rather than intuition.", "I like setting measurable goals and tracking my progress."],
+            Ti: ["I enjoy breaking down complex problems into smaller, logical parts.", "I often question the validity of rules and systems.", "I prefer understanding the fundamental principles behind ideas.", "I value precision and accuracy in my reasoning very highly.", "I enjoy exploring abstract theories and concepts.", "I prefer relying on my own logic rather than external opinions.", "I often analyze my own thought processes to improve them.", "I enjoy debating ideas to test their logical consistency."],
+            Fe: ["I prioritize harmony and avoid conflict in social situations.", "I easily pick up on the emotions of those around me.", "I enjoy helping others and making them feel comfortable.", "I feel responsible for maintaining a positive atmosphere.", "I often adjust my behavior to fit the mood of the group.", "I often consider how my actions will affect others emotionally.", "I enjoy working in teams and collaborating with others.", "I feel uneasy when there is tension or conflict in a group."],
+            Fi: ["I make decisions based on my personal values and feelings.", "I value authenticity and being true to myself very highly.", "I feel a deep connection to my personal beliefs and principles.", "I often prioritize what I feel is right over what is purely logical.", "I enjoy exploring my own identity and what makes me unique.", "I often reflect on my emotions and internal experiences.", "I stand up firmly for causes I care about.", "I enjoy creative activities that allow me to express my inner self."],
+            Ne: ["I enjoy brainstorming and exploring new possibilities.", "I often make connections between seemingly unrelated ideas.", "I get excited easily about starting new projects.", "I often see multiple ways to approach a problem.", "I enjoy discussions about abstract concepts and future potential.", "I feel energized when I can explore new ideas and perspectives.", "I often come up with creative solutions to problems.", "I enjoy imagining different scenarios and outcomes."],
+            Ni: ["I often have sudden insights or moments of immediate understanding.", "I focus on long-term goals and future outcomes.", "I enjoy finding deeper meanings in events and experiences.", "I often trust my gut feeling when making decisions.", "I often notice patterns and connections that others miss.", "I am drawn to understanding the hidden meaning of things.", "I enjoy planning for the future and setting distant goals.", "I often have a sense that I can predict how things will turn out."],
+            Se: ["I live in the moment and enjoy sensory experiences.", "I notice details in my environment that others miss.", "I enjoy physical activities and practical tasks.", "I feel energized when I can interact with the world around me.", "I enjoy trying new foods, music, and physical sensations.", "I often act on impulse by going with the flow.", "I feel more alive when I am fully immersed in the present.", "I enjoy activities that require quick reflexes and coordination."],
+            Si: ["I rely on my past experiences to guide my decisions.", "I enjoy routines and familiar environments.", "I have an excellent memory for details and concrete facts.", "I feel most comfortable when things are predictable and stable.", "I feel a strong connection to traditions and customs.", "I enjoy reminiscing about past experiences and memories.", "I often compare new experiences to old ones.", "I feel grounded when I can count on habitual routines."]
         };
 
         const ENNEA_POOL = {
-            1: { so: ["I feel a strong responsibility to set an example of integrity for my community.", "I often focus on how social systems or groups should be improved."], sp: ["I worry a lot about my health and keeping my immediate environment 'just right'.", "I am very disciplined about my physical routines and personal habits."], sx: ["I have very high, almost perfectionistic expectations for my partner and close friends.", "I am driven to reform the people I am closest to so they reach their potential."] },
-            2: { so: ["I enjoy being an influential person who knows and helps the 'right' people.", "I find a lot of satisfaction in being the 'glue' that holds a group together."], sp: ["I tend to be extra sweet or charming so that others will feel naturally inclined to care for me.", "I am very aware of my physical needs and often look for others to help meet them."], sx: ["I focus a lot of energy on being attractive and desirable to the specific person I like.", "I crave deep, intimate appreciation from a significant other above all else."] },
-            3: { so: ["I care a lot about my professional image and how the 'world' sees my successes.", "I am very aware of social status and where I stand in any hierarchy."], sp: ["I work very hard to be financially secure, self-sufficient, and professional.", "I focus more on my actual tangible achievements than on just looking successful."], sx: ["I focus my energy on helping my partner or close friends become the best version of themselves.", "I want to be seen as the 'ideal' or most impressive partner."] },
-            4: { so: ["I often feel like I am fundamentally different from others in a way that prevents me from fitting in.", "I feel a sense of shame or 'missing something' when I compare myself to the group."], sp: ["I tend to keep my struggles and deep pains to myself, pushing through them with endurance.", "I am very sensitive to my physical environment and need it to reflect my mood."], sx: ["I am highly competitive and want to be seen as the most unique or talented in my field.", "I feel a passionate intensity in my one-on-one connections, often mixed with envy."] },
-            5: { so: ["I enjoy being part of a group of experts who share my specific, niche interests.", "I value being seen as a competent authority on a subject within a community."], sp: ["I have a very strong need for a private, safe space where I can be completely alone.", "I am very careful with my personal resources, energy, and time."], sx: ["I look for one deep, 'soulmate' connection where I can share my entire inner world.", "I am intensely curious about the secret or hidden parts of the person I love."] },
-            6: { so: ["I look to rules, traditions, or reliable groups to help me feel secure and certain.", "I place a high value on loyalty to the institutions or communities I belong to."], sp: ["I look for safety by building warm, supportive, and predictable friendships.", "I am naturally cautious about potential risks to my physical security or health."], sx: ["I tend to face my fears head-on by being strong, assertive, or even intimidating.", "I look for a partner who is incredibly strong and protective."] },
-            7: { so: ["I am willing to sacrifice some of my personal fun for the good of the group or a cause.", "I enjoy being the 'visionary' who brings people together for new possibilities."], sp: ["I am very focused on making sure I have all the resources, comforts, and 'goodies' I need.", "I am a 'networker' who knows how to get what I want for my own security."], sx: ["I am always looking for a 'peak experience' or a 'soulmate' who can keep up with my intensity.", "I get bored easily in relationships that lack a sense of wonder or newness."] },
-            8: { so: ["I am a natural protector of my 'pack', my friends, family, and the underdog.", "I use my strength and directness to ensure fairness and justice in my group."], sp: ["I am very focused on controlling my immediate physical space and my resources.", "I value my independence and want to ensure nobody can ever threaten my security."], sx: ["I crave a high level of intensity, passion, and a real 'lust' for life in my connections.", "I want to be completely 'possessed' by or 'possess' my significant other."] },
-            9: { so: ["I feel most alive and 'at home' when I am part of a harmonious group or community.", "I often take on the interests or identity of the group to maintain peace."], sp: ["I find a lot of comfort and security in my simple daily physical routines and habits.", "I prefer a stable, comfortable life without too much stress, noise, or drama."], sx: ["I tend to merge my identity and interests with the person I am closest to.", "I crave a deep sense of 'oneness' and total harmony with my partner."] }
+            1: { so: ["I feel a strong responsibility to set an example of integrity for my community.", "I often focus on how social systems or groups should be improved."], sp: ["I worry a lot about my health and keeping my immediate environment impeccable.", "I am very disciplined regarding my physical routines and personal habits."], sx: ["I have very high, almost perfectionistic expectations for my partner and close friends.", "I am driven to reform the people close to me so they reach their potential."] },
+            2: { so: ["I enjoy being an influential person who knows and helps the 'right' people.", "I find a lot of satisfaction in being the 'glue' that holds a group together."], sp: ["I tend to be particularly soft or charming so that others naturally feel like taking care of me.", "I am very aware of my physical needs and often look to others to help meet them."], sx: ["I focus a lot of energy on being attractive and desirable to the specific person I like.", "I crave a deep and intimate appreciation from a partner above all else."] },
+            3: { so: ["I care deeply about my professional image and how the 'world' sees my successes.", "I am very aware of social status and where I stand in any hierarchy."], sp: ["I work very hard to be financially secure, self-sufficient, and professional.", "I focus on my actual tangible accomplishments more than just looking successful."], sx: ["I focus my energy on helping my partner or close friends become the best version of themselves.", "I want to be seen as the 'ideal' or most impressive partner."] },
+            4: { so: ["I often feel that I am fundamentally different from others, which prevents me from fitting in.", "I feel a sense of shame or of 'missing something' when I compare myself to the group."], sp: ["I tend to keep my struggles and deep pains to myself, going through them with endurance.", "I am very sensitive to my material environment and need it to reflect my mood."], sx: ["I am very competitive and want to be recognized as the most unique or talented in my field.", "I experience a passionate intensity in my one-to-one relationships, often mixed with envy."] },
+            5: { so: ["I enjoy being part of a group of experts who share my specific and niche interests.", "I value being seen as a competent authority on a topic within a community."], sp: ["I have a vital need for a private and secure space where I can be completely alone.", "I am very careful with my personal resources, energy, and time."], sx: ["I look for one unique and deep relationship where I can share my entire inner universe.", "I am intensely curious about the secret or hidden parts of the person I love."] },
+            6: { so: ["I look to rules, traditions, or reliable groups to help me feel safe and certain.", "I deeply value loyalty to the institutions or communities I belong to."], sp: ["I seek security by building warm, protective, and predictable friendships.", "I am naturally cautious about potential risks to my physical security or health."], sx: ["I tend to face my fears head-on by being strong, assertive, or even intimidating.", "I look for a partner who is incredibly strong and protective."] },
+            7: { so: ["I am willing to sacrifice some of my personal pleasure for the good of the group or a cause.", "I enjoy being the visionary who brings people together for new possibilities."], sp: ["I make scrupulous sure I have all the resources, comfort, and advantages I need.", "I am a good networker who knows how to get what I want for my own security."], sx: ["I am always looking for a 'peak experience' or a 'soulmate' who can keep up with my emotional intensity.", "I get bored easily in relationships that lack magic or novelty."] },
+            8: { so: ["I am a natural protector of my 'clan', my friends, family, and the underdog.", "I use my strength and frankness to ensure fairness and justice in my group."], sp: ["I over-focus on controlling my immediate physical space and resources.", "I value my independence highly and want to ensure that no one can threaten my security."], sx: ["I seek a high level of intensity, passion, and a real appetite for life in my relationships.", "I want to be totally possessed by, or possess, my partner."] },
+            9: { so: ["I feel more alive and in my place when I am part of a harmonious group or community.", "I often merge with the interests or identity of the group to maintain peace."], sp: ["I find a lot of comfort and security in my simple daily routines and habits.", "I prefer a stable and comfortable life without too much stress, noise, or drama."], sx: ["I tend to merge my identity and interests with those of the person I am closest to.", "I crave a deep sense of unity and total harmony with my partner."] }
         };
 
         const TRITYPE_POOL = {
-            1: ["I am driven by a strong sense of what is right and wrong.", "I hold myself and others to very high standards of behavior."],
-            2: ["I am very sensitive to the needs and feelings of people around me.", "I often put the needs of others ahead of my own."],
-            3: ["I am highly motivated by reaching my goals and being successful.", "I feel most valuable when I am being productive and getting things done."],
-            4: ["I have a deep need to understand my own unique identity and feelings.", "I value being authentic and exploring the more profound parts of life."],
-            5: ["I need plenty of alone time to think and process my thoughts.", "I am driven to master my interests and gain as much knowledge as possible."],
-            6: ["I naturally look for potential risks and like to be prepared for what could go wrong.", "I place a high value on loyalty, security, and having a reliable support system."],
-            7: ["I am always looking for new experiences and exciting future possibilities.", "I feel trapped or restless when life becomes too repetitive or boring."],
-            8: ["I am comfortable taking charge and being direct in tough situations.", "I respect people who stand their ground and are honest about where they stand."],
-            9: ["I prioritize keeping things peaceful and harmonious in my life.", "I often go along with what others want to avoid conflict or tension."]
+            1: ["I am driven by a strong sense of what is right and what is wrong.", "I hold myself and others to very high standards of behavior."],
+            2: ["I am very sensitive to the needs and feelings of the people around me.", "I often put others' needs before my own."],
+            3: ["I have a strong motivation to achieve my goals and be successful.", "I feel my most valuable when I am productive and getting things done."],
+            4: ["I have a deep need to understand my own identity and unique emotions.", "I value authenticity and exploring the deep aspects of life."],
+            5: ["I need a lot of time alone to reflect and process my thoughts.", "I am driven to master my interests and gain as much knowledge as possible."],
+            6: ["I naturally look for potential risks and like to be prepared for what could go wrong.", "I highly value loyalty, security, and having a reliable support system."],
+            7: ["I am always looking for new experiences and exciting future possibilities.", "I feel trapped or restless when life becomes too routine or boring."],
+            8: ["I am comfortable taking charge and being direct in difficult situations.", "I respect people who stand their ground and are honest about where they stand."],
+            9: ["I prioritize maintaining peace and harmony in my life.", "I often go along with what others want to avoid conflict or tension."]
         };
 
         const DARK_TRIAD_POOL = {
             machiavellianism: [
-                "It's generally better to only tell people what they want to hear.",
+                "It is generally better to tell people only what they want to hear.",
                 "I find it easy to manipulate others to get what I want.",
-                "Winning is more important than how you play the game."
+                "Winning is more important than how the game is played."
             ],
             narcissism: [
                 "I find that I am naturally more talented or special than most others.",
-                "I enjoy being the center of attention in any social setting.",
+                "I enjoy being the center of attention in any social gathering.",
                 "I expect special treatment because of who I am."
             ],
             psychopathy: [
-                "I rarely feel remorse or guilt even when I've hurt someone's feelings.",
-                "I tend to be more impulsive and reckless than the people I know.",
+                "I rarely feel remorse or guilt, even if I have hurt someone's feelings.",
+                "I tend to be more impulsive and reckless than the average person.",
                 "I find it easy to stay calm in situations where others would be distressed."
             ]
         };
-
-        const SOCIONICS_MAP = {
-            'INTJ': 'ILI', 'ENTJ': 'LIE', 'INFJ': 'IEI', 'ENFJ': 'EIE',
-            'INTP': 'LII', 'ENTP': 'ILE', 'INFP': 'EII', 'ENFP': 'IEE',
-            'ISTJ': 'LSI', 'ESTJ': 'LSE', 'ISFJ': 'SEI', 'ESFJ': 'ESE',
-            'ISTP': 'SLI', 'ESTP': 'SLE', 'ISFP': 'ESI', 'ESFP': 'SEE'
-        };
-
-        const TEMPERAMENT_MAP = {
-            'ENTJ': 'Choleric', 'ESTJ': 'Choleric', 'ESFJ': 'Choleric', 'ENFJ': 'Choleric',
-            'ESTP': 'Sanguine', 'ENTP': 'Sanguine', 'ENFP': 'Sanguine', 'ESFP': 'Sanguine',
-            'INTJ': 'Melancholic', 'INFJ': 'Melancholic', 'ISTJ': 'Melancholic', 'INFP': 'Melancholic',
-            'INTP': 'Phlegmatic', 'ISTP': 'Phlegmatic', 'ISFP': 'Phlegmatic', 'ISFJ': 'Phlegmatic'
-        };
-
-        const CENTERS = { 'Gut': ['8', '9', '1'], 'Heart': ['2', '3', '4'], 'Head': ['5', '6', '7'] };
-        const TYPE_TO_CENTER = { '1': 'Gut', '8': 'Gut', '9': 'Gut', '2': 'Heart', '3': 'Heart', '4': 'Heart', '5': 'Head', '6': 'Head', '7': 'Head' };
 
         const DEFAULT_ENNEA_MAP = {
             'INTJ': ['5'], 'ENTJ': ['1', '3', '7'], 'INFJ': ['4', '5', '6'], 'ENFJ': ['2', '3', '7'],
@@ -403,11 +385,10 @@
         // --- ENGINE STATE ---
         let mbtiScores = { Te: 0, Ti: 0, Fe: 0, Fi: 0, Ne: 0, Ni: 0, Se: 0, Si: 0 };
         let mbtiAnswerCounts = { Te: 0, Ti: 0, Fe: 0, Fi: 0, Ne: 0, Ni: 0, Se: 0, Si: 0 };
-        let enneaScores = {}; // Still used for type winning determination
+        let enneaScores = {}; 
         let subtypeScores = {};
         let dtScores = { machiavellianism: 0, narcissism: 0, psychopathy: 0 };
         
-        // Unified Enneagram Tracker (for the Web)
         let enneaPercTotals = { '1':0,'2':0,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0,'9':0 };
         let enneaQuestionCounts = { '1':0,'2':0,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0,'9':0 };
 
@@ -517,7 +498,7 @@
                         </div>
                         <input type="range" min="0" max="100" step="10" value="50" class="custom-slider" id="input-slider" oninput="updateSliderValue(this.value)">
                         <div class="slider-value" id="slider-display">50%</div>
-                        <button class="btn-submit" onclick="handleSliderAnswer()">SUBMIT RESPONSE</button>
+                        <button class="btn-submit" onclick="handleSliderAnswer()">SUBMIT ANSWER</button>
                     </div>
                 </div>
             `;
@@ -674,6 +655,20 @@
 
         function handleFinalCompletion() {
             document.getElementById('loading-overlay').style.display = 'flex';
+            const SOCIONICS_MAP = {
+                'INTJ': 'ILI', 'ENTJ': 'LIE', 'INFJ': 'IEI', 'ENFJ': 'EIE',
+                'INTP': 'LII', 'ENTP': 'ILE', 'INFP': 'EII', 'ENFP': 'IEE',
+                'ISTJ': 'LSI', 'ESTJ': 'LSE', 'ISFJ': 'SEI', 'ESFJ': 'ESE',
+                'ISTP': 'SLI', 'ESTP': 'SLE', 'ISFP': 'ESI', 'ESFP': 'SEE'
+            };
+            const TEMPERAMENT_MAP = {
+                'ENTJ': 'Choleric', 'ESTJ': 'Choleric', 'ESFJ': 'Choleric', 'ENFJ': 'Choleric',
+                'ESTP': 'Sanguine', 'ENTP': 'Sanguine', 'ENFP': 'Sanguine', 'ESFP': 'Sanguine',
+                'INTJ': 'Melancholic', 'INFJ': 'Melancholic', 'ISTJ': 'Melancholic', 'INFP': 'Melancholic',
+                'INTP': 'Phlegmatic', 'ISTP': 'Phlegmatic', 'ISFP': 'Phlegmatic', 'ISFJ': 'Phlegmatic'
+            };
+            const TYPE_TO_CENTER = { '1': 'Gut', '8': 'Gut', '9': 'Gut', '2': 'Heart', '3': 'Heart', '4': 'Heart', '5': 'Head', '6': 'Head', '7': 'Head' };
+            const CENTERS = { 'Gut': ['8', '9', '1'], 'Heart': ['2', '3', '4'], 'Head': ['5', '6', '7'] };
             
             // 1. Instinct Stack Synthesis
             const subEntries = Object.entries(subtypeScores).filter(([key]) => key.startsWith(coreEnneagram + "_"));
@@ -718,7 +713,8 @@
                     machiavellianism: Math.round(dtScores.machiavellianism / 3),
                     narcissism: Math.round(dtScores.narcissism / 3),
                     psychopathy: Math.round(dtScores.psychopathy / 3)
-                }
+                },
+                lang: 'en'
             };
             localStorage.setItem('unified_results', JSON.stringify(results));
             setTimeout(() => { window.location.href = 'results.html'; }, 2000);
