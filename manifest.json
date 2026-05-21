@@ -1,0 +1,17 @@
+{
+  "name": "True Type Test",
+  "short_name": "TrueType",
+  "description": "Multilingual Personality Assessment (MBTI, Enneagram, Socionics)",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0d0d0d",
+  "theme_color": "#00ff9d",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
