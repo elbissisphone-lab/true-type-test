@@ -1,6 +1,6 @@
-/* MBTI Specific Styles */
 @import url('style.css');
 
+/* MBTI Specific Styles */
 /* Profiles/Results specific */
 .type-description, .function-section, .career-section, .weak-functions {
     background-color: var(--darker);
