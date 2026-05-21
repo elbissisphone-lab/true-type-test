@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>True Type Test | Оценка личности</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="../mbti.css">
+    <style>
+        /* Exact Re-implementation of MBTI Test UI with Tournament Logic */
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .logo-main {
+            display: block;
+            width: 120px;
+            height: auto;
+            margin: 0 auto 10px;
+            filter: drop-shadow(0 0 10px var(--primary));
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            letter-spacing: 4px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Progress Header */
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--primary);
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background-color: var(--darkest);
+            border-radius: 5px;
+            margin-bottom: 40px;
+            overflow: hidden;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), #00cc88);
+            box-shadow: 0 0 10px var(--primary);
+            transition: width 0.4s ease;
+        }
+
+        .phase-banner {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: var(--lighter);
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+        }
+
+        /* MBTI Test Statement Style */
+        .statement-box {
+            padding: 30px;
+            background-color: var(--darker);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .statement-box p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: var(--lighter);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* MBTI Test Options Style */
+        .options-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .option-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            width: 18%;
+            transition: transform 0.2s;
+        }
+
+        .option-cell:hover { transform: translateY(-3px); }
+
+        .circle-indicator {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 2px solid var(--darkest);
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            background-color: var(--darkest);
+            flex-shrink: 0;
+        }
+
+        /* Circle Colors (Unselected) */
+        .totally-agree-circle { border-color: #00ff9d; }
+        .agree-circle { border-color: #2ecc71; }
+        .neutral-circle { border-color: #7f8c8d; }
+        .disagree-circle { border-color: #ff9800; }
+        .totally-disagree-circle { border-color: #ff0000; }
+
+        /* Selection States */
+        .option-cell.active .totally-agree-circle { background-color: #00ff9d; box-shadow: 0 0 10px #00ff9d; }
+        .option-cell.active .agree-circle { background-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
+        .option-cell.active .neutral-circle { background-color: #7f8c8d; box-shadow: 0 0 6px #7f8c8d; }
+        .option-cell.active .disagree-circle { background-color: #ff9800; box-shadow: 0 0 8px #ff9800; }
+        .option-cell.active .totally-disagree-circle { background-color: #ff0000; box-shadow: 0 0 10px #ff0000; }
+
+        .option-cell span {
+            font-size: 0.85rem;
+            text-align: center;
+            color: var(--light);
+        }
+
+        /* Loader Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loader-text {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary);
+            letter-spacing: 5px;
+            margin-top: 20px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        /* Slider UI */
+        .slider-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 40px auto;
+            text-align: center;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Orbitron';
+            font-size: 0.8rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .custom-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: var(--darkest);
+            border-radius: 3px;
+            outline: none;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--primary);
+            border: 2px solid var(--dark);
+        }
+
+        .slider-value {
+            font-family: 'Orbitron';
+            font-size: 2rem;
+            color: #fff;
+            margin-top: 20px;
+            text-shadow: 0 0 15px var(--primary);
+        }
+
+        .btn-submit {
+            margin-top: 40px;
+            padding: 12px 40px;
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-family: 'Orbitron';
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.5rem; }
+            .statement-box { padding: 20px; }
+            .statement-box p { font-size: 1.1rem; }
+            
+            .options-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .option-cell {
+                width: 100%;
+                flex-direction: row;
+                justify-content: flex-start;
+                padding: 12px;
+                background-color: var(--darkest);
+                border-radius: 6px;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .circle-indicator {
+                margin-bottom: 0;
+                margin-right: 15px;
+                width: 22px;
+                height: 22px;
+            }
+
+            .option-cell span { font-size: 1rem; text-align: left; }
+            .slider-value { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" style="text-decoration: none; color: inherit; display: block; width: fit-content; margin: 0 auto;">
+            <img src="logo.png" alt="True Type Test Logo" class="logo-main">
+        </a>
+        <h1> TRUE TYPE TEST</h1>
+        
+        <div class="progress-header">
+            <span id="node-info">Вопрос: 1</span>
+            <span id="perc-info">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div id="progress-fill"></div>
+        </div>
+
+        <div id="phase-label" class="phase-banner">Фаза 1: Стили мышления</div>
+
+        <div id="test-content">
+            <!-- Dynamic Statement Content -->
+        </div>
+    </div>
+
+    <div id="loading-overlay">
+        <div class="loader-text">Обработка результатов...</div>
+    </div>
+
+    <script src="../shared.js"></script>
+    <script>
+        // --- DATA POOLS ---
+        const MBTI_POOL = {
+            Te: ["Мне нравится эффективно организовывать и структурировать задачи.", "Я предпочитаю четкие логические системы абстрактным идеям.", "Я часто беру на себя руководство в группах, чтобы обеспечить выполнение дел.", "Мне нравится создавать системы для повышения продуктивности.", "Я ставлю эффективность и результаты выше личных чувств.", "Я чувствую удовлетворение, когда вычеркиваю задачи из списка дел.", "Я предпочитаю полагаться на данные и факты, а не на интуицию.", "Мне нравится ставить измеримые цели и отслеживать свой прогресс."],
+            Ti: ["Мне нравится разбивать сложные проблемы на более простые логические части.", "Я часто ставлю под сомнение обоснованность правил и систем.", "Я предпочитаю понимать фундаментальные принципы, лежащие в основе идей.", "Я придаю большое значение точности и аккуратности в своих рассуждениях.", "Мне нравится исследовать абстрактные теории и концепции.", "Я предпочитаю полагаться на собственную логику, а не на внешние мнения.", "Я часто анализирую свои мыслительные процессы, чтобы их улучшить.", "Мне нравится обсуждать идеи, чтобы проверить их логическую последовательность."],
+            Fe: ["Я отдаю приоритет гармонии и избегаю конфликтов в социальных ситуациях.", "Я легко улавливаю эмоции окружающих.", "Мне нравится помогать другим и создавать для них комфорт.", "Я чувствую ответственность за поддержание позитивной атмосферы.", "Я часто корректирую свое поведение, чтобы оно соответствовало настроению группы.", "Я часто задумываюсь о том, как мои действия повлияют на других эмоционально.", "Мне нравится работать в команде и сотрудничать с другими людьми.", "Я чувствую себя неуютно, когда в группе возникает напряжение или конфликт."],
+            Fi: ["Я принимаю решения, основываясь на своих личных ценностях и чувствах.", "Я высоко ценю аутентичность и верность самому себе.", "Я чувствую глубокую связь со своими личными убеждениями и принципами.", "Я часто отдаю приоритет тому, что кажется мне правильным, а не тому, что чисто логично.", "Мне нравится исследовать свою идентичность и то, что делает меня уникальным.", "Я часто размышляю о своих эмоциях и внутреннем опыте.", "Я твердо защищаю дела, которые мне дороги.", "Мне нравятся творческие занятия, позволяющие выразить мое внутреннее 'я'."],
+            Ne: ["Мне нравится проводить мозговые штурмы и исследовать новые возможности.", "Я часто нахожу связи между идеями, которые кажутся не связанными.", "Я с энтузиазмом начинаю новые проекты.", "Я часто вижу несколько способов решения одной проблемы.", "Мне нравятся дискуссии об абстрактных концепциях и будущем потенциале.", "Я чувствую прилив сил, когда могу исследовать новые идеи и точки зрения.", "Я часто нахожу креативные решения проблем.", "Мне нравится представлять различные сценарии и результаты."],
+            Ni: ["У меня часто бывают внезапные прозрения или моменты немедленного понимания.", "Я концентрируюсь на долгосрочных целях и будущих результатах.", "Мне нравится находить глубокий смысл в событиях и переживаниях.", "Я часто доверяю своей интуиции при принятии решений.", "Я часто замечаю закономерности и связи, которые другие упускают.", "Меня тянет к пониманию скрытого смысла вещей.", "Мне нравится планировать будущее и ставить отдаленные цели.", "У меня часто возникает ощущение, что я могу предсказать, как все обернется."],
+            Se: ["Я живу моментом и наслаждаюсь чувственным опытом.", "Я замечаю детали в окружении, которые другие пропускают.", "Мне нравятся физические нагрузки и практические задачи.", "Я чувствую прилив энергии, когда могу взаимодействовать с миром вокруг.", "Мне нравится пробовать новую еду, музыку и физические ощущения.", "Я часто действую импульсивно, плывя по течению.", "Я чувствую себя более живым, когда полностью погружен в настоящее.", "Мне нравятся занятия, требующие быстрой реакции и координации."],
+            Si: ["Я опираюсь на свой прошлый опыт при принятии решений.", "Мне нравятся привычные процедуры и знакомая обстановка.", "У меня отличная память на детали и конкретные факты.", "Я чувствую себя комфортнее, когда все предсказуемо и стабильно.", "Я чувствую сильную связь с традициями и обычаями.", "Мне нравится вспоминать прошлый опыт и воспоминания.", "Я часто сравниваю новый опыт со старым.", "Я чувствую уверенность, когда могу полагаться на привычный распорядок дня."]
+        };
+
+        const ENNEA_POOL = {
+            1: { so: ["Я чувствую сильную ответственность за то, чтобы подавать пример честности своему сообществу.", "Я часто концентрируюсь на том, как следует улучшить социальные системы или группы."], sp: ["Я очень беспокоюсь о своем здоровье и о том, чтобы поддерживать безупречный порядок в моем непосредственном окружении.", "Я очень дисциплинирован в своих физических привычках и личном распорядке."], sx: ["У меня очень высокие, почти перфекционистские ожидания от моего партнера и близких друзей.", "Мной движет желание 'исправлять' близких мне людей, чтобы они реализовали свой потенциал."] },
+            2: { so: ["Мне нравится быть влиятельным человеком, который знает 'правильных' людей и помогает им.", "Я нахожу большое удовлетворение в том, чтобы быть 'клеем', скрепляющим группу."], sp: ["Я склонен быть особенно мягким или обаятельным, чтобы у других возникало естественное желание заботиться обо мне.", "Я хорошо осознаю свои физические потребности и часто ищу помощи у других для их удовлетворения."], sx: ["Я трачу много энергии на то, чтобы быть привлекательным и желанным для конкретного человека, который мне нравится.", "Больше всего я стремлюсь к глубокому и интимному признанию со стороны партнера."] },
+            3: { so: ["Меня очень заботит мой профессиональный имидж и то, как мир воспринимает мои успехи.", "Я хорошо осведомлен о социальном статусе и своем месте в любой иерархии."], sp: ["Я очень много работаю, чтобы быть финансово обеспеченным, самодостаточным и профессиональным.", "Я больше концентрируюсь на своих реальных ощутимых достижениях, чем просто на том, чтобы казаться успешным."], sx: ["Я направляю свою энергию на то, чтобы помочь моему партнеру или близким друзьям стать лучшей версией себя.", "Я хочу, чтобы меня воспринимали как 'идеального' или самого впечатляющего партнера."] },
+            4: { so: ["Я часто чувствую, что принципиально отличаюсь от других, что мешает мне вписаться в коллектив.", "Я испытываю чувство стыда или 'неполноценности', когда сравниваю себя с группой."], sp: ["Я склонен держать свою внутреннюю борьбу и глубокую боль при себе, перенося их со стойкостью.", "Я очень чувствителен к своей материальной среде, и мне нужно, чтобы она отражала мое настроение."], sx: ["Я очень склонен к соперничеству и хочу быть признанным самым уникальным или талантливым в своей области.", "Я испытываю страстную интенсивность в отношениях один на один, часто смешанную с завистью."] },
+            5: { so: ["Мне нравится быть частью группы экспертов, разделяющих мои специфические и узкие интересы.", "Я ценю, когда меня считают компетентным авторитетом в какой-либо теме внутри сообщества."], sp: ["У меня есть жизненная потребность в личном и безопасном пространстве, где я могу быть в полном одиночестве.", "Я очень бережно отношусь к своим личным ресурсам, энергии и времени."], sx: ["Я ищу одни глубокие и уникальные отношения, в которых я мог бы полностью поделиться своим внутренним миром.", "Мне очень интересны секретные или скрытые стороны любимого человека."] },
+            6: { so: ["Я полагаюсь на правила, традиции или надежные группы, чтобы чувствовать себя в безопасности и уверенности.", "Я высоко ценю лояльность учреждениям или сообществам, к которым я принадлежу."], sp: ["Я ищу безопасности, выстраивая теплые, защищенные и предсказуемые дружеские отношения.", "Я от природы осторожен в отношении потенциальных рисков для моей физической безопасности или здоровья."], sx: ["Я склонен встречать свои страхи лицом к лицу, будучи сильным, напористым или даже пугающим.", "Я ищу партнера, который был бы невероятно сильным и защищающим."] },
+            7: { so: ["Я готов пожертвовать частью своего личного удовольствия ради блага группы или дела.", "Мне нравится быть провидцем, который объединяет людей ради новых возможностей."], sp: ["Я тщательно слежу за тем, чтобы у меня были все необходимые ресурсы, комфорт и преимущества.", "Я умею налаживать связи и знаю, как получить то, что мне нужно для собственной безопасности."], sx: ["Я всегда ищу 'пиковый опыт' или 'родственную душу', способную выдержать мой эмоциональный накал.", "Мне быстро становится скучно в отношениях, которым не хватает волшебства или новизны."] },
+            8: { so: ["Я естественный защитник своего 'клана', моих друзей, семьи и угнетенных.", "Я использую свою силу и прямолинейность для обеспечения справедливости и честности в моей группе."], sp: ["Я чрезмерно концентрируюсь на контроле своего непосредственного физического пространства и ресурсов.", "Я высоко ценю свою независимость и хочу быть уверенным, что никто не сможет угрожать моей безопасности."], sx: ["Я стремлюсь к высокому уровню интенсивности, страсти и настоящему вкусу к жизни в своих отношениях.", "Я хочу полностью обладать своим партнером или принадлежать ему."] },
+            9: { so: ["Я чувствую себя наиболее живым и на своем месте, когда являюсь частью гармоничной группы или сообщества.", "Я часто сливаюсь с интересами или идентичностью группы ради сохранения мира."], sp: ["Я нахожу много комфорта и безопасности в простых повседневных делах и привычках.", "Я предпочитаю стабильную и комфортную жизнь без лишнего стресса, шума или драм."], sx: ["Я склонен сливать свою идентичность и интересы с тем, кто мне наиболее близок.", "Я жажду глубокого чувства единства и полной гармонии со своим партнером."] }
+        };
+
+        const TRITYPE_POOL = {
+            1: ["Мной движет сильное чувство того, что правильно, а что нет.", "Я предъявляю очень высокие требования к поведению — как к себе, так и к другим."],
+            2: ["Я очень чувствителен к потребностям и чувствам окружающих меня людей.", "Я часто ставлю нужды других выше своих собственных."],
+            3: ["У меня есть сильная мотивация к достижению целей и успеху.", "Я чувствую свою ценность, когда продуктивен и добиваюсь результатов."],
+            4: ["У меня есть глубокая потребность понять свою уникальную идентичность и чувства.", "Я ценю аутентичность и исследование глубоких аспектов жизни."],
+            5: ["Мне нужно много времени в одиночестве, чтобы обдумать и переработать свои мысли.", "Мной движет желание в совершенстве овладеть своими интересами и получить как можно больше знаний."],
+            6: ["Я по своей природе ищу потенциальные риски и люблю быть готовым к тому, что что-то может пойти не так.", "Я высоко ценю лояльность, безопасность и наличие надежной системы поддержки."],
+            7: ["Я всегда ищу новые впечатления и захватывающие возможности в будущем.", "Я чувствую себя в ловушке или становлюсь беспокойным, когда жизнь становится слишком однообразной или скучной."],
+            8: ["Мне комфортно брать на себя ответственность и быть прямолинейным в трудных ситуациях.", "Я уважаю людей, которые твердо стоят на своем и честно заявляют о своей позиции."],
+            9: ["Я отдаю приоритет сохранению мира и гармонии в своей жизни.", "Я часто соглашаюсь с тем, чего хотят другие, чтобы избежать конфликтов или напряженности."]
+        };
+
+        const DARK_TRIAD_POOL = {
+            machiavellianism: [
+                "Как правило, лучше говорить людям только то, что они хотят услышать.",
+                "Мне легко манипулировать другими, чтобы получить то, что я хочу.",
+                "Победа важнее того, как ведется игра."
+            ],
+            narcissism: [
+                "Я нахожу, что от природы я более талантлив или одарен, чем большинство других людей.",
+                "Мне нравится быть в центре внимания в любой социальной компании.",
+                "Я ожидаю особого отношения к себе из-за того, кто я есть."
+            ],
+            psychopathy: [
+                "Я редко чувствую угрызения совести или вину, даже если обидел чьи-то чувства.",
+                "Я склонен быть более импульсивным и безрассудным, чем большинство людей, которых я знаю.",
+                "Мне легко сохранять спокойствие в ситуациях, когда другие были бы в смятении."
+            ]
+        };
+
+        const DEFAULT_ENNEA_MAP = {
+            'INTJ': ['5'], 'ENTJ': ['1', '3', '7'], 'INFJ': ['4', '5', '6'], 'ENFJ': ['2', '3', '7'],
+            'INTP': ['5', '6'], 'ENTP': ['7'], 'INFP': ['4', '6', '9'], 'ENFP': ['4', '7'],
+            'ISTJ': ['1', '6', '9'], 'ESTJ': ['1', '3', '6'], 'ISFJ': ['2', '6', '9'], 'ESFJ': ['2', '3', '6'],
+            'ISTP': ['5', '6', '9'], 'ESTP': ['3', '8'], 'ISFP': ['2', '4', '6', '9'], 'ESFP': ['2', '3', '8']
+        };
+
+        const DEFAULT_SUBTYPE_MAP = {
+            'INTJ': { '5': ['sp', 'so', 'sx'] }, 'ENTJ': { '1': ['sp', 'so', 'sx'], '3': ['sp', 'so'], '7': ['sp', 'so'] },
+            'INFJ': { '4': ['sp', 'so'], '5': ['sx'], '6': ['sp', 'so'] }, 'ENFJ': { '2': ['sp', 'so', 'sx'], '3': ['sx'], '7': ['so'] },
+            'INTP': { '5': ['sp', 'so', 'sx'], '6': ['sp', 'so', 'sx'] }, 'ENTP': { '7': ['sp', 'so'] },
+            'INFP': { '4': ['sp', 'so', 'sx'], '6': ['sp', 'so', 'sx'], '9': ['sp', 'so', 'sx'] }, 'ENFP': { '4': ['sp', 'so'], '7': ['so', 'sx'] },
+            'ISTJ': { '1': ['sp', 'so', 'sx'], '6': ['sp', 'so', 'sx'], '9': ['sp', 'so', 'sx'] }, 'ESTJ': { '1': ['sp', 'so', 'sx'], '3': ['sp', 'so'], '6': ['sp', 'so', 'sx'] },
+            'ISFJ': { '2': ['sp', 'so', 'sx'], '6': ['sp', 'so', 'sx'], '9': ['sp', 'so', 'sx'] }, 'ESFJ': { '2': ['sp', 'so'], '3': ['sx'], '6': ['sp', 'so', 'sx'] },
+            'ISTP': { '5': ['sp', 'sx'], '6': ['sp', 'so', 'sx'], '9': ['sp', 'so', 'sx'] }, 'ESTP': { '3': ['so'], '8': ['sp', 'so', 'sx'] },
+            'ISFP': { '2': ['sp', 'sx'], '4': ['sp', 'so', 'sx'], '6': ['sp', 'so', 'sx'], '9': ['sp', 'so', 'sx'] }, 'ESFP': { '2': ['sp', 'so', 'sx'], '3': ['sp', 'so'], '8': ['so', 'sx'] }
+        };
+
+        const DEFAULT_FIX_MAP = {
+            'INTJ': ['1', '3', '4', '5', '8', '9'], 'ENTJ': ['1', '3', '7', '8', '9'], 'INFJ': ['1', '2', '4', '5', '6', '9'],
+            'ENFJ': ['1', '2', '3', '6', '7', '8', '9'], 'INTP': ['1', '3', '4', '5', '6', '9'], 'ENTP': ['1', '3', '7', '8', '9'],
+            'INFP': ['1', '2', '4', '5', '6', '9'], 'ENFP': ['1', '2', '4', '7', '8', '9'], 'ISTJ': ['1', '3', '5', '6', '9'],
+            'ESTJ': ['1', '3', '6', '8', '9'], 'ISFJ': ['1', '2', '4', '6', '9'], 'ESFJ': ['1', '2', '3', '6', '8', '9'],
+            'ISTP': ['1', '3', '5', '6', '9'], 'ESTP': ['3', '7', '8'], 'ISFP': ['1', '2', '4', '6', '7', '9'],
+            'ESFP': ['2', '3', '4', '7', '8', '9']
+        };
+
+        // --- ENGINE STATE ---
+        let mbtiScores = { Te: 0, Ti: 0, Fe: 0, Fi: 0, Ne: 0, Ni: 0, Se: 0, Si: 0 };
+        let mbtiAnswerCounts = { Te: 0, Ti: 0, Fe: 0, Fi: 0, Ne: 0, Ni: 0, Se: 0, Si: 0 };
+        let enneaScores = {}; 
+        let subtypeScores = {};
+        let dtScores = { machiavellianism: 0, narcissism: 0, psychopathy: 0 };
+        
+        let enneaPercTotals = { '1':0,'2':0,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0,'9':0 };
+        let enneaQuestionCounts = { '1':0,'2':0,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0,'9':0 };
+
+        let questionQueue = []; let currentQuestionIndex = 0;
+        let phase = 'mbti'; 
+        let detectedMBTI = null; let coreEnneagram = null;
+        let activeEnneaMap = {}; let activeSubtypeMap = {}; let activeFixMap = {};
+        let phaseStartIndex = 0; let phaseTotal = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function init() {
+            const savedEnnea = localStorage.getItem('tournament_ennea_map');
+            const savedSub = localStorage.getItem('tournament_subtype_map');
+            const savedFix = localStorage.getItem('tournament_fix_map');
+            activeEnneaMap = savedEnnea ? JSON.parse(savedEnnea) : DEFAULT_ENNEA_MAP;
+            activeSubtypeMap = savedSub ? JSON.parse(savedSub) : DEFAULT_SUBTYPE_MAP;
+            activeFixMap = savedFix ? JSON.parse(savedFix) : DEFAULT_FIX_MAP;
+
+            const mbtiQuestions = [];
+            Object.keys(MBTI_POOL).forEach(func => {
+                const pool = shuffle([...MBTI_POOL[func]]);
+                for (let i = 0; i < 5; i++) mbtiQuestions.push({ type: 'mbti', key: func, text: pool[i] });
+            });
+            questionQueue = shuffle(mbtiQuestions);
+            phaseTotal = questionQueue.length;
+            phaseStartIndex = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('test-content');
+            const q = questionQueue[currentQuestionIndex];
+            if (!q) {
+                if (phase === 'mbti') handleMBTICompletion();
+                else if (phase === 'subtype_tournament') handleSubtypeCompletion();
+                else if (phase === 'tritype') handleTritypeCompletion();
+                else handleFinalCompletion();
+                return;
+            }
+
+            const questionsAnsweredInPhase = currentQuestionIndex - phaseStartIndex;
+            const perc = Math.round((questionsAnsweredInPhase / phaseTotal) * 100);
+            document.getElementById('progress-fill').style.width = perc + '%';
+            document.getElementById('node-info').textContent = `Вопрос: ${currentQuestionIndex + 1}`;
+            document.getElementById('perc-info').textContent = perc + '%';
+
+            if (phase === 'mbti') {
+                document.getElementById('phase-label').textContent = "Фаза 1: Стили мышления";
+                renderStandardOptions(container, q);
+            } else if (phase === 'subtype_tournament') {
+                document.getElementById('phase-label').textContent = "Фаза 2: Эннеаграмма и инстинкты";
+                renderStandardOptions(container, q);
+            } else if (phase === 'tritype') {
+                document.getElementById('phase-label').textContent = "Фаза 3: Глубинные мотивации";
+                renderSliderOptions(container, q);
+            } else {
+                document.getElementById('phase-label').textContent = "Фаза 4: Черты личности";
+                renderSliderOptions(container, q);
+            }
+        }
+
+        function renderStandardOptions(container, q) {
+            container.innerHTML = `
+                <div class="statement-box">
+                    <p>${q.text}</p>
+                    <div class="options-row">
+                        <div class="option-cell" onclick="handleAnswer(2, this)">
+                            <div class="circle-indicator totally-agree-circle"></div>
+                            <span>Полностью согласен</span>
+                        </div>
+                        <div class="option-cell" onclick="handleAnswer(1, this)">
+                            <div class="circle-indicator agree-circle"></div>
+                            <span>Согласен</span>
+                        </div>
+                        <div class="option-cell" onclick="handleAnswer(0, this)">
+                            <div class="circle-indicator neutral-circle"></div>
+                            <span>Нейтрально</span>
+                        </div>
+                        <div class="option-cell" onclick="handleAnswer(-1, this)">
+                            <div class="circle-indicator disagree-circle"></div>
+                            <span>Не согласен</span>
+                        </div>
+                        <div class="option-cell" onclick="handleAnswer(-2, this)">
+                            <div class="circle-indicator totally-disagree-circle"></div>
+                            <span>Полностью не согласен</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSliderOptions(container, q) {
+            container.innerHTML = `
+                <div class="statement-box">
+                    <p>${q.text}</p>
+                    <div class="slider-container">
+                        <div class="slider-labels">
+                            <span>НЕ СОГЛАСЕН</span>
+                            <span>СОГЛАСЕН</span>
+                        </div>
+                        <input type="range" min="0" max="100" step="10" value="50" class="custom-slider" id="input-slider" oninput="updateSliderValue(this.value)">
+                        <div class="slider-value" id="slider-display">50%</div>
+                        <button class="btn-submit" onclick="handleSliderAnswer()">ОТПРАВИТЬ ОТВЕТ</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.updateSliderValue = function(val) {
+            document.getElementById('slider-display').textContent = val + '%';
+        }
+
+        window.handleSliderAnswer = function() {
+            const val = parseInt(document.getElementById('input-slider').value);
+            handleAnswer(val, null, true);
+        }
+
+        window.handleAnswer = function(value, el, isSlider = false) {
+            if (el) el.classList.add('active');
+            const q = questionQueue[currentQuestionIndex];
+            
+            const questionsAnsweredInPhase = (currentQuestionIndex - phaseStartIndex) + 1;
+            const perc = Math.min(100, Math.round((questionsAnsweredInPhase / phaseTotal) * 100));
+            document.getElementById('progress-fill').style.width = perc + '%';
+            document.getElementById('perc-info').textContent = perc + '%';
+
+            setTimeout(() => {
+                if (q.type === 'mbti') {
+                    const originalIndex = { '2': 0, '1': 1, '0': 2, '-1': 3, '-2': 4 }[value];
+                    mbtiScores[q.key] += [10, 7.5, 5, 2.5, 0][originalIndex];
+                    mbtiAnswerCounts[q.key]++;
+                } else if (q.type === 'dark_triad') {
+                    dtScores[q.key] += isSlider ? value : { '2': 100, '1': 75, '0': 50, '-1': 25, '-2': 0 }[value];
+                } else {
+                    const [type, category] = q.key.split('_');
+                    const percValue = isSlider ? value : { '2': 100, '1': 75, '0': 50, '-1': 25, '-2': 0 }[value];
+                    enneaPercTotals[type] += percValue;
+                    enneaQuestionCounts[type]++;
+                    const engineScore = isSlider ? ((value / 25) - 2) : value;
+                    enneaScores[type] = (enneaScores[type] || 0) + engineScore;
+                    if (q.type === 'subtype_tournament') subtypeScores[q.key] = (subtypeScores[q.key] || 0) + engineScore;
+                }
+                currentQuestionIndex++;
+                renderQuestion();
+            }, isSlider ? 0 : 300);
+        };
+
+        function handleMBTICompletion() {
+            detectedMBTI = calculateMBTI();
+            const config = activeSubtypeMap[detectedMBTI] || {};
+            const allowedEnneas = activeEnneaMap[detectedMBTI] || [];
+            phase = 'subtype_tournament';
+            const tournamentQuestions = [];
+            Object.keys(config).forEach(t => {
+                if (!allowedEnneas.includes(t)) return;
+                config[t].forEach(sub => {
+                    if (ENNEA_POOL[t] && ENNEA_POOL[t][sub]) {
+                        const pool = ENNEA_POOL[t][sub];
+                        const shuffled = shuffle([...pool]);
+                        for(let i=0; i<3; i++) if (shuffled[i]) tournamentQuestions.push({ type: 'subtype_tournament', key: `${t}_${sub}`, text: shuffled[i] });
+                    }
+                });
+            });
+            if (tournamentQuestions.length === 0) { handleSubtypeCompletion(); return; }
+            const shuffledTournament = shuffle(tournamentQuestions);
+            phaseStartIndex = currentQuestionIndex;
+            phaseTotal = shuffledTournament.length;
+            questionQueue = questionQueue.concat(shuffledTournament);
+            document.getElementById('progress-fill').style.width = '0%';
+            document.getElementById('perc-info').textContent = '0%';
+            renderQuestion();
+        }
+
+        function handleSubtypeCompletion() {
+            coreEnneagram = Object.entries(enneaScores).sort((a,b) => b[1] - a[1])[0][0];
+            phase = 'tritype';
+            document.getElementById('phase-label').textContent = "Фаза 3: Глубинные мотивации";
+            const tritypeQuestions = [];
+            ['1','2','3','4','5','6','7','8','9'].forEach(t => {
+                if (t === coreEnneagram) return;
+                const pool = TRITYPE_POOL[t] || [];
+                for(let i=0; i<2; i++) if (pool[i]) tritypeQuestions.push({ type: 'tritype', key: `${t}_gen`, text: pool[i] });
+            });
+            if (tritypeQuestions.length === 0) { handleTritypeCompletion(); return; }
+            const shuffledTritype = shuffle(tritypeQuestions);
+            phaseStartIndex = currentQuestionIndex;
+            phaseTotal = shuffledTritype.length;
+            questionQueue = questionQueue.concat(shuffledTritype);
+            document.getElementById('progress-fill').style.width = '0%';
+            document.getElementById('perc-info').textContent = '0%';
+            renderQuestion();
+        }
+
+        function handleTritypeCompletion() {
+            phase = 'dark_triad';
+            const dtQuestions = [];
+            Object.keys(DARK_TRIAD_POOL).forEach(trait => {
+                DARK_TRIAD_POOL[trait].forEach(text => {
+                    dtQuestions.push({ type: 'dark_triad', key: trait, text: text });
+                });
+            });
+            const shuffledDT = shuffle(dtQuestions);
+            phaseStartIndex = currentQuestionIndex;
+            phaseTotal = shuffledDT.length;
+            questionQueue = questionQueue.concat(shuffledDT);
+            document.getElementById('progress-fill').style.width = '0%';
+            document.getElementById('perc-info').textContent = '0%';
+            renderQuestion();
+        }
+
+        function calculateMBTI() {
+            const normalized = {};
+            Object.keys(mbtiScores).forEach(f => normalized[f] = mbtiAnswerCounts[f] > 0 ? (mbtiScores[f] / (mbtiAnswerCounts[f] * 10)) * 100 : 0);
+            const stacks = { "INTJ": ["Ni", "Te", "Fi", "Se"], "ENTJ": ["Te", "Ni", "Se", "Fi"], "INFJ": ["Ni", "Fe", "Ti", "Se"], "ENFJ": ["Fe", "Ni", "Se", "Ti"], "INTP": ["Ti", "Ne", "Si", "Fe"], "ENTP": ["Ne", "Ti", "Fe", "Si"], "INFP": ["Fi", "Ne", "Si", "Te"], "ENFP": ["Ne", "Fi", "Te", "Si"], "ISTJ": ["Si", "Te", "Fi", "Ne"], "ESTJ": ["Te", "Si", "Ne", "Fi"], "ISFJ": ["Si", "Fe", "Ti", "Ne"], "ESFJ": ["Fe", "Si", "Ne", "Ti"], "ISTP": ["Ti", "Se", "Ni", "Fe"], "ESTP": ["Se", "Ti", "Fe", "Ni"], "ISFP": ["Fi", "Se", "Ni", "Te"], "ESFP": ["Se", "Fi", "Te", "Ni"] };
+            const typeScores = {};
+            const weights = [1.0, 0.8, 0.6, 0.4];
+            Object.keys(stacks).forEach(type => {
+                let s = 0;
+                stacks[type].forEach((f, i) => s += normalized[f] * weights[i]);
+                typeScores[type] = s;
+            });
+            return Object.keys(typeScores).reduce((a, b) => typeScores[a] > typeScores[b] ? a : b);
+        }
+
+        function handleFinalCompletion() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+            const SOCIONICS_MAP = { 'INTJ': 'ILI', 'ENTJ': 'LIE', 'INFJ': 'IEI', 'ENFJ': 'EIE', 'INTP': 'LII', 'ENTP': 'ILE', 'INFP': 'EII', 'ENFP': 'IEE', 'ISTJ': 'LSI', 'ESTJ': 'LSE', 'ISFJ': 'SEI', 'ESFJ': 'ESE', 'ISTP': 'SLI', 'ESTP': 'SLE', 'ISFP': 'ESI', 'ESFP': 'SEE' };
+            const TEMPERAMENT_MAP = { 'ENTJ': 'Choleric', 'ESTJ': 'Choleric', 'ESFJ': 'Choleric', 'ENFJ': 'Choleric', 'ESTP': 'Sanguine', 'ENTP': 'Sanguine', 'ENFP': 'Sanguine', 'ESFP': 'Sanguine', 'INTJ': 'Melancholic', 'INFJ': 'Melancholic', 'ISTJ': 'Melancholic', 'INFP': 'Melancholic', 'INTP': 'Phlegmatic', 'ISTP': 'Phlegmatic', 'ISFP': 'Phlegmatic', 'ISFJ': 'Phlegmatic' };
+            const TYPE_TO_CENTER = { '1': 'Gut', '8': 'Gut', '9': 'Gut', '2': 'Heart', '3': 'Heart', '4': 'Heart', '5': 'Head', '6': 'Head', '7': 'Head' };
+            const CENTERS = { 'Gut': ['8', '9', '1'], 'Heart': ['2', '3', '4'], 'Head': ['5', '6', '7'] };
+            const subEntries = Object.entries(subtypeScores).filter(([key]) => key.startsWith(coreEnneagram + "_"));
+            const winningSubtype = subEntries.sort((a,b) => b[1] - a[1])[0][0].split('_')[1];
+            let secSubtype = (subEntries.length > 1) ? subEntries.sort((a,b) => b[1] - a[1])[1][0].split('_')[1] : '';
+            if (!secSubtype) secSubtype = ['sp', 'so', 'sx'].filter(i => i !== winningSubtype)[0];
+            const finalEnneaWeb = {};
+            [1,2,3,4,5,6,7,8,9].forEach(t => {
+                const count = enneaQuestionCounts[t];
+                finalEnneaWeb[t] = count > 0 ? Math.round(enneaPercTotals[t] / count) : 10;
+            });
+            const allowedFixes = activeFixMap[detectedMBTI] || [];
+            const tritypeArray = [coreEnneagram];
+            ['Gut', 'Heart', 'Head'].forEach(c => {
+                if (c === TYPE_TO_CENTER[coreEnneagram]) return;
+                const validTypesInCenter = CENTERS[c].filter(t => allowedFixes.includes(t));
+                const typesToConsider = validTypesInCenter.length > 0 ? validTypesInCenter : CENTERS[c];
+                const winnerInCenter = typesToConsider.sort((a,b) => finalEnneaWeb[b] - finalEnneaWeb[a])[0];
+                tritypeArray.push(winnerInCenter);
+            });
+            const normalizedMBTI = {};
+            Object.keys(mbtiScores).forEach(f => normalizedMBTI[f] = mbtiAnswerCounts[f] > 0 ? (mbtiScores[f] / (mbtiAnswerCounts[f] * 10)) * 100 : 0);
+
+            const results = { 
+                mbti: detectedMBTI, mbti_normalized: normalizedMBTI,
+                enneagram: coreEnneagram, ennea_scores_raw: finalEnneaWeb, 
+                subtype: winningSubtype, secondary_subtype: secSubtype,
+                tritype: tritypeArray.join(''), socionics: SOCIONICS_MAP[detectedMBTI], temperament: TEMPERAMENT_MAP[detectedMBTI],
+                dark_triad: {
+                    machiavellianism: Math.round(dtScores.machiavellianism / 3),
+                    narcissism: Math.round(dtScores.narcissism / 3),
+                    psychopathy: Math.round(dtScores.psychopathy / 3)
+                },
+                lang: 'ru'
+            };
+            localStorage.setItem('unified_results', JSON.stringify(results));
+            setTimeout(() => { window.location.href = 'results-ru.html'; }, 2000);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

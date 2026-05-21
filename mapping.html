@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>True Type Test | Neural Control Center</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        :root {
+            --primary: #00ff9d;
+            --darker: #0a0b10;
+            --card-bg: #151921;
+            --mbti-color: #00ccff;
+            --ennea-color: #ffeb3b;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding-bottom: 120px;
+        }
+
+        .lab-header {
+            padding: 40px;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(0, 255, 157, 0.05) 0%, transparent 70%);
+            border-bottom: 1px solid rgba(0, 255, 157, 0.1);
+        }
+
+        .lab-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            letter-spacing: 8px;
+            color: var(--primary);
+            text-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+        }
+
+        .controls {
+            max-width: 98%;
+            margin: 20px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .mapping-table-container {
+            width: 98%;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow-x: auto;
+            max-height: 70vh;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            table-layout: fixed;
+        }
+
+        th {
+            background: rgba(21, 25, 33, 0.95);
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+            text-align: left;
+            padding: 12px;
+            font-size: 0.6rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid var(--primary);
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+        }
+
+        .col-id { width: 80px; }
+        .col-text { width: 450px; }
+        .col-power { width: 45px; }
+        .col-ops { width: 80px; }
+
+        input[type="text"], textarea {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 8px;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 0.8rem;
+        }
+
+        textarea {
+            height: 60px;
+            resize: vertical;
+            line-height: 1.3;
+        }
+
+        .power-input {
+            text-align: center;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem !important;
+            padding: 5px 0 !important;
+        }
+
+        .power-pos { color: var(--primary); background: rgba(0, 255, 157, 0.05) !important; border-color: var(--primary) !important; }
+        .power-neg { color: #ff4444; background: rgba(255, 68, 68, 0.05) !important; border-color: #ff4444 !important; }
+        .power-zero { opacity: 0.3; }
+
+        .mbti-cell { border-left: 1px solid rgba(0, 204, 255, 0.2); }
+        .ennea-cell { border-left: 1px solid rgba(255, 235, 59, 0.2); }
+
+        .btn-action {
+            background: var(--primary);
+            color: var(--dark);
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .btn-action:hover {
+            box-shadow: 0 0 15px var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .toolbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 11, 16, 0.98);
+            backdrop-filter: blur(15px);
+            padding: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            border-top: 1px solid var(--primary);
+            z-index: 1000;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
+        }
+
+        .search-bar {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--primary);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 30px;
+            width: 300px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+        }
+
+        tr:hover { background: rgba(255, 255, 255, 0.03); }
+    </style>
+</head>
+<body>
+    <div class="lab-header">
+        <h1>NEURAL CONTROL CENTER</h1>
+        <p style="opacity: 0.6; font-size: 0.8rem; margin-top: 10px;">ULTRA-SURGICAL MATRIX | 85 OPTIMIZED NODES</p>
+    </div>
+
+    <div class="controls">
+        <div style="display: flex; gap: 20px;">
+            <button class="btn-action" onclick="addNewRow()">+ NEW NEURAL NODE</button>
+            <input type="text" class="search-bar" placeholder="SEARCH DIAGNOSTICS..." id="search-input" oninput="render()">
+        </div>
+        <div style="font-family: 'Orbitron'; font-size: 0.8rem; color: var(--primary);">
+            NODES ACTIVE: <span id="node-count">0</span>
+        </div>
+    </div>
+
+    <div class="mapping-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-id">ID</th>
+                    <th class="col-text">DIAGNOSTIC QUESTION TEXT</th>
+                    <th colspan="8" style="text-align: center; color: var(--mbti-color);">MBTI COGNITIVE TRIGGERS (-4 to +4)</th>
+                    <th colspan="9" style="text-align: center; color: var(--ennea-color);">ENNEAGRAM TRIGGERS (-4 to +4)</th>
+                    <th class="col-ops">OPS</th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th class="col-power mbti-cell">Te</th><th class="col-power mbti-cell">Ti</th>
+                    <th class="col-power mbti-cell">Fe</th><th class="col-power mbti-cell">Fi</th>
+                    <th class="col-power mbti-cell">Ne</th><th class="col-power mbti-cell">Ni</th>
+                    <th class="col-power mbti-cell">Se</th><th class="col-power mbti-cell">Si</th>
+                    <th class="col-power ennea-cell">E1</th><th class="col-power ennea-cell">E2</th>
+                    <th class="col-power ennea-cell">E3</th><th class="col-power ennea-cell">E4</th>
+                    <th class="col-power ennea-cell">E5</th><th class="col-power ennea-cell">E6</th>
+                    <th class="col-power ennea-cell">E7</th><th class="col-power ennea-cell">E8</th>
+                    <th class="col-power ennea-cell">E9</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-action" onclick="saveToLocal()">SAVE CHANGES LOCALLY</button>
+        <button class="btn-action" style="background: var(--secondary);" onclick="syncToEngine()">DEPLOY TO NEURAL ENGINE</button>
+        <button class="btn-action" style="background: #ff4444;" onclick="resetDefaults()">RESET TO 85 SURGICAL NODES</button>
+    </div>
+
+    <script>
+        const FUNCTIONS = ['Te', 'Ti', 'Fe', 'Fi', 'Ne', 'Ni', 'Se', 'Si'];
+        const ENNEAGRAMS = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+        let nodes = [];
+
+        // GENERATE ULTRA-OPTIMIZED 5-PER-GROUP BANK (85 NODES)
+        const RAW_FUNCTIONS = {
+            Te: ["I prioritize objective efficiency and logical systems.", "I naturally take charge to meet deadlines.", "I value external authority and data-driven results.", "I enjoy organizing people and resources.", "I am decisive and focused on implementation."],
+            Ti: ["I value precision and internal consistency.", "I break down systems to see how they work.", "I enjoy refining theories indefinitely.", "I care more about technical truth than popularity.", "I build my own frameworks rather than using experts."],
+            Fe: ["I am attuned to the emotional atmosphere.", "I prioritize social harmony above all else.", "I adapt my behavior to make others comfortable.", "I express my emotions openly with groups.", "I feel energized by collaborative projects."],
+            Fi: ["I have a clear sense of internal right and wrong.", "I prioritize authenticity over social pressure.", "I often feel misunderstood or different.", "I prioritize internal values over achievements.", "I am deeply empathetic to others' pain."],
+            Ne: ["I brainstorm new possibilities constantly.", "I see connections between unrelated concepts.", "I am easily bored by routine.", "I love exploring 'what if' scenarios.", "I am curious and learn about everything."],
+            Ni: ["I perceive underlying patterns and future implications.", "I have a strong vision for long-term trends.", "I trust my gut insights over external data.", "I focus on a single, deep meaning.", "I look for the hidden agenda behind events."],
+            Se: ["I thrive on immediate sensory engagement.", "I am practical and hands-on.", "I enjoy being in the present moment physically.", "I react instantly to changes in my environment.", "I value aesthetics and the 'here and now'."],
+            Si: ["I rely on proven methods and past experience.", "I value stability, routine, and schedules.", "I have a strong memory for sensory facts.", "I respect tradition and established ways.", "I am naturally cautious and prepared."]
+        };
+
+        const GENERATED_NODES = [];
+        Object.entries(RAW_FUNCTIONS).forEach(([f, texts]) => {
+            texts.forEach((t, i) => {
+                GENERATED_NODES.push({ id: `${f.toLowerCase()}_${i+1}`, text: t, triggers: { mbti: { [f]: 4 }, ennea: {} } });
+            });
+        });
+        for(let e=1; e<=9; e++) {
+            const texts = [`I feel an intense need to be principled and correct.`, `I am driven to be helpful and indispensable.`, `I focus on success, achievement, and image.`, `I seek to express my unique identity and depth.`, `I prefer to observe and maintain independence.`];
+            texts.forEach((txt, j) => {
+                GENERATED_NODES.push({ id: `e${e}_${j+1}`, text: txt, triggers: { mbti: {}, ennea: { [e]: 4 } } });
+            });
+        }
+
+        function init() {
+            // Force migration to v6 for the 85-node bank
+            const saved = localStorage.getItem('neural_nodes_v6');
+            nodes = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(GENERATED_NODES));
+            render();
+        }
+
+        function render() {
+            const filter = document.getElementById('search-input').value.toLowerCase();
+            const body = document.getElementById('table-body');
+            body.innerHTML = '';
+            
+            let count = 0;
+            nodes.forEach((node, actualIndex) => {
+                if (!node.text.toLowerCase().includes(filter) && !node.id.toLowerCase().includes(filter)) return;
+                count++;
+
+                const tr = document.createElement('tr');
+                const mbtiInputs = FUNCTIONS.map(f => {
+                    const val = node.triggers.mbti[f] || 0;
+                    return `<td class="mbti-cell"><input type="text" class="power-input ${val > 0 ? 'power-pos' : val < 0 ? 'power-neg' : 'power-zero'}" value="${val}" onchange="updateVal(${actualIndex}, 'mbti', '${f}', this.value)"></td>`;
+                }).join('');
+
+                const enneaInputs = ENNEAGRAMS.map(e => {
+                    const val = node.triggers.ennea[e] || 0;
+                    return `<td class="ennea-cell"><input type="text" class="power-input ${val > 0 ? 'power-pos' : val < 0 ? 'power-neg' : 'power-zero'}" value="${val}" onchange="updateVal(${actualIndex}, 'ennea', '${e}', this.value)"></td>`;
+                }).join('');
+
+                tr.innerHTML = `
+                    <td class="col-id"><input type="text" style="font-family: Orbitron; font-size: 0.6rem;" value="${node.id}" onchange="nodes[${actualIndex}].id = this.value"></td>
+                    <td class="col-text"><textarea onchange="nodes[${actualIndex}].text = this.value">${node.text}</textarea></td>
+                    ${mbtiInputs}
+                    ${enneaInputs}
+                    <td class="col-ops"><button class="btn-action" style="background:#ff4444; padding:5px 10px;" onclick="deleteRow(${actualIndex})">DEL</button></td>
+                `;
+                body.appendChild(tr);
+            });
+            document.getElementById('node-count').textContent = count;
+        }
+
+        window.updateVal = function(idx, sys, key, val) {
+            const num = parseInt(val);
+            if (isNaN(num) || num < -4 || num > 4) { alert("Value must be -4 to +4"); render(); return; }
+            nodes[idx].triggers[sys][key] = num;
+            render();
+        };
+
+        window.deleteRow = function(idx) { if(confirm("Delete node?")) { nodes.splice(idx, 1); render(); } };
+        window.addNewRow = function() { nodes.unshift({ id: "NEW", text: "New diagnostic...", triggers: { mbti: {}, ennea: {} } }); render(); };
+        window.saveToLocal = function() { localStorage.setItem('neural_nodes_v6', JSON.stringify(nodes)); alert("Saved to v6 storage."); };
+        window.resetDefaults = function() { if(confirm("FORCE RESET to 85 surgical nodes? Current custom edits will be wiped.")) { nodes = JSON.parse(JSON.stringify(GENERATED_NODES)); render(); } };
+
+        window.syncToEngine = function() {
+            const enginePool = nodes.map(n => {
+                const weights = { mbti: {}, enneagram: {} };
+                Object.entries(n.triggers.mbti).forEach(([f, p]) => weights.mbti[f] = p * 0.25);
+                Object.entries(n.triggers.ennea).forEach(([e, p]) => weights.enneagram[e] = p * 0.40);
+                return { id: n.id, text: n.text, weights };
+            });
+            localStorage.setItem('calibrated_questions', JSON.stringify(enginePool));
+            localStorage.setItem('neural_nodes_v6', JSON.stringify(nodes));
+            alert("MATRIX DEPLOYED! Testing engine is now surgically calibrated (85 Nodes).");
+        };
+
+        init();
+    </script>
+</body>
+</html>

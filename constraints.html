@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>True Type Test | Neural Constraints Lab</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        :root {
+            --primary: #00ff9d;
+            --darker: #0a0b10;
+            --card-bg: #151921;
+            --allowed-bg: rgba(0, 255, 157, 0.1);
+            --forbidden-bg: rgba(255, 68, 68, 0.05);
+        }
+
+        body {
+            background-color: var(--dark);
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding-bottom: 120px;
+        }
+
+        .lab-header {
+            padding: 40px;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(0, 255, 157, 0.05) 0%, transparent 70%);
+            border-bottom: 1px solid rgba(0, 255, 157, 0.1);
+        }
+
+        .lab-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            letter-spacing: 8px;
+            color: var(--primary);
+        }
+
+        .section-title {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            margin: 60px 0 20px;
+            color: var(--primary);
+            letter-spacing: 3px;
+        }
+
+        .matrix-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            background: var(--card-bg);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        th {
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+            padding: 12px;
+            font-size: 0.6rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        td {
+            padding: 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .mbti-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            width: 100px;
+            text-align: center;
+            position: sticky;
+            left: 0;
+            z-index: 10;
+        }
+
+        .constraint-cell {
+            height: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            vertical-align: middle;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.55rem;
+            color: rgba(255,255,255,0.1);
+        }
+
+        .constraint-cell.allowed {
+            background: var(--allowed-bg);
+            color: var(--primary);
+            box-shadow: inset 0 0 8px rgba(0, 255, 157, 0.1);
+        }
+
+        .constraint-cell.allowed::after {
+            content: 'YES';
+            font-weight: bold;
+        }
+
+        .constraint-cell.forbidden::after {
+            content: 'NO';
+        }
+
+        .constraint-cell:hover {
+            filter: brightness(1.5);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .toolbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 11, 16, 0.95);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            border-top: 1px solid var(--primary);
+            z-index: 100;
+        }
+
+        .btn-action {
+            background: var(--primary);
+            color: var(--dark);
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .btn-action:hover { box-shadow: 0 0 20px var(--primary); }
+
+        .type-header {
+            background: rgba(255, 255, 255, 0.03);
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="lab-header">
+        <h1>NEURAL CONSTRAINTS LAB</h1>
+        <p style="opacity: 0.6; font-size: 0.8rem; margin-top: 10px;">CONFIGURE ENNEAGRAM & SUBTYPE ARCHITECTURE</p>
+    </div>
+
+    <div class="section-title">CORE ENNEAGRAM MATRIX</div>
+    <div class="matrix-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>MBTI TYPE</th>
+                    <th>E1</th><th>E2</th><th>E3</th><th>E4</th><th>E5</th><th>E6</th><th>E7</th><th>E8</th><th>E9</th>
+                </tr>
+            </thead>
+            <tbody id="ennea-matrix-body"></tbody>
+        </table>
+    </div>
+
+    <div class="section-title">SUBTYPE GRANularity (27 PATHS)</div>
+    <div class="matrix-container">
+        <table>
+            <thead>
+                <tr id="subtype-header-types">
+                    <th rowspan="2">MBTI TYPE</th>
+                    <!-- Generated via JS -->
+                </tr>
+                <tr id="subtype-header-subs">
+                    <!-- Generated via JS -->
+                </tr>
+            </thead>
+            <tbody id="subtype-matrix-body"></tbody>
+        </table>
+    </div>
+
+    <div class="section-title">TRITYPE FIX ARCHITECTURE (FIXES PER MBTI)</div>
+    <div class="matrix-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>MBTI TYPE</th>
+                    <th>E1</th><th>E2</th><th>E3</th><th>E4</th><th>E5</th><th>E6</th><th>E7</th><th>E8</th><th>E9</th>
+                </tr>
+            </thead>
+            <tbody id="fix-matrix-body"></tbody>
+        </table>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-action" onclick="saveAll()">SAVE TOURNAMENT LOGIC</button>
+        <button class="btn-action" style="background: #ff4444; color: #fff;" onclick="resetAll()">RESET TO DEFAULTS</button>
+    </div>
+
+    <script>
+        const MBTI_TYPES = ['INTJ', 'ENTJ', 'INFJ', 'ENFJ', 'INTP', 'ENTP', 'INFP', 'ENFP', 'ISTJ', 'ESTJ', 'ISFJ', 'ESFJ', 'ISTP', 'ESTP', 'ISFP', 'ESFP'];
+        const ENNEAGRAMS = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        const SUBTYPES = ['sp', 'so', 'sx'];
+
+        let enneaConstraints = {};
+        let subtypeConstraints = {};
+        let fixConstraints = {};
+
+        const DEFAULT_ENNEA = {
+            'INTJ': ['5'], 'ENTJ': ['1', '3', '7'], 'INFJ': ['4', '5', '6'], 'ENFJ': ['2', '3', '7'],
+            'INTP': ['5', '6'], 'ENTP': ['7'], 'INFP': ['4', '6', '9'], 'ENFP': ['4', '7'],
+            'ISTJ': ['1', '6', '9'], 'ESTJ': ['1', '3', '6'], 'ISFJ': ['2', '6', '9'], 'ESFJ': ['2', '3', '6'],
+            'ISTP': ['5', '6', '9'], 'ESTP': ['3', '8'], 'ISFP': ['2', '4', '6', '9'], 'ESFP': ['2', '3', '8']
+        };
+
+        const DEFAULT_SUBTYPE_MAP = {
+            'INTJ': { '5': ['sp', 'so', 'sx'] },
+            'ENTJ': { '1': ['sp', 'so', 'sx'], '3': ['sp', 'so'], '7': ['sp', 'so'] },
+            'INFJ': { '4': ['sp', 'so'], '5': ['sx'], '6': ['sp', 'so'] },
+            'ENFJ': { '2': ['sp', 'so', 'sx'], '3': ['sx'], '7': ['so'] },
+            'INTP': { '5': ['sp', 'so', 'sx'], '6': ['sp', 'so', 'sx'] },
+            'ENTP': { '7': ['sp', 'so'] },
+            'INFP': { '4': ['sp', 'so', 'sx'], '6': ['sp', 'so', 'sx'], '9': ['sp', 'so', 'sx'] },
+            'ENFP': { '4': ['sp', 'so'], '7': ['so', 'sx'] },
+            'ISTJ': { '1': ['sp', 'so', 'sx'], '6': ['sp', 'so', 'sx'], '9': ['sp', 'so', 'sx'] },
+            'ESTJ': { '1': ['sp', 'so', 'sx'], '3': ['sp', 'so'], '6': ['sp', 'so', 'sx'] },
+            'ISFJ': { '2': ['sp', 'so', 'sx'], '6': ['sp', 'so', 'sx'], '9': ['sp', 'so', 'sx'] },
+            'ESFJ': { '2': ['sp', 'so'], '3': ['sx'], '6': ['sp', 'so', 'sx'] },
+            'ISTP': { '5': ['sp', 'sx'], '6': ['sp', 'so', 'sx'], '9': ['sp', 'so', 'sx'] },
+            'ESTP': { '3': ['so'], '8': ['sp', 'so', 'sx'] },
+            'ISFP': { '2': ['sp', 'sx'], '4': ['sp', 'so', 'sx'], '6': ['sp', 'so', 'sx'], '9': ['sp', 'so', 'sx'] },
+            'ESFP': { '2': ['sp', 'so', 'sx'], '3': ['sp', 'so'], '8': ['so', 'sx'] }
+        };
+
+        const DEFAULT_FIX_MAP = {
+            'INTJ': ['1', '3', '4', '5', '8', '9'],
+            'ENTJ': ['1', '3', '7', '8', '9'],
+            'INFJ': ['1', '2', '4', '5', '6', '9'],
+            'ENFJ': ['1', '2', '3', '6', '7', '8', '9'],
+            'INTP': ['1', '3', '4', '5', '6', '9'],
+            'ENTP': ['1', '3', '7', '8', '9'],
+            'INFP': ['1', '2', '4', '5', '6', '9'],
+            'ENFP': ['1', '2', '4', '7', '8', '9'],
+            'ISTJ': ['1', '3', '5', '6', '9'],
+            'ESTJ': ['1', '3', '6', '8', '9'],
+            'ISFJ': ['1', '2', '4', '6', '9'],
+            'ESFJ': ['1', '2', '3', '6', '8', '9'],
+            'ISTP': ['1', '3', '5', '6', '9'],
+            'ESTP': ['3', '7', '8'],
+            'ISFP': ['1', '2', '4', '6', '7', '9'],
+            'ESFP': ['2', '3', '4', '7', '8', '9']
+        };
+
+        function init() {
+            const savedEnnea = localStorage.getItem('tournament_ennea_map');
+            const savedSub = localStorage.getItem('tournament_subtype_map');
+            const savedFix = localStorage.getItem('tournament_fix_map');
+
+            enneaConstraints = savedEnnea ? JSON.parse(savedEnnea) : JSON.parse(JSON.stringify(DEFAULT_ENNEA));
+            subtypeConstraints = savedSub ? JSON.parse(savedSub) : JSON.parse(JSON.stringify(DEFAULT_SUBTYPE_MAP));
+            fixConstraints = savedFix ? JSON.parse(savedFix) : JSON.parse(JSON.stringify(DEFAULT_FIX_MAP));
+
+            buildHeaders();
+            render();
+        }
+
+        function buildHeaders() {
+            const typesRow = document.getElementById('subtype-header-types');
+            const subsRow = document.getElementById('subtype-header-subs');
+
+            ENNEAGRAMS.forEach(e => {
+                const thType = document.createElement('th');
+                thType.colSpan = 3;
+                thType.textContent = 'E' + e;
+                thType.className = 'type-header';
+                typesRow.appendChild(thType);
+
+                SUBTYPES.forEach(s => {
+                    const thSub = document.createElement('th');
+                    thSub.textContent = s.toUpperCase();
+                    subsRow.appendChild(thSub);
+                });
+            });
+        }
+
+        function render() {
+            // Render Ennea Matrix
+            const enneaBody = document.getElementById('ennea-matrix-body');
+            enneaBody.innerHTML = '';
+            MBTI_TYPES.forEach(mbti => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td class="mbti-label">${mbti}</td>`;
+                ENNEAGRAMS.forEach(e => {
+                    const isAllowed = enneaConstraints[mbti].includes(e);
+                    const td = document.createElement('td');
+                    td.className = `constraint-cell ${isAllowed ? 'allowed' : 'forbidden'}`;
+                    td.onclick = () => toggleEnnea(mbti, e);
+                    tr.appendChild(td);
+                });
+                enneaBody.appendChild(tr);
+            });
+
+            // Render Subtype Matrix
+            const subBody = document.getElementById('subtype-matrix-body');
+            subBody.innerHTML = '';
+            MBTI_TYPES.forEach(mbti => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td class="mbti-label">${mbti}</td>`;
+                ENNEAGRAMS.forEach(e => {
+                    const enneaAllowed = enneaConstraints[mbti].includes(e);
+                    SUBTYPES.forEach(s => {
+                        const isAllowed = enneaAllowed && subtypeConstraints[mbti][e] && subtypeConstraints[mbti][e].includes(s);
+                        const td = document.createElement('td');
+                        td.className = `constraint-cell ${isAllowed ? 'allowed' : 'forbidden'}`;
+                        if (!enneaAllowed) td.style.opacity = '0.2';
+                        td.onclick = () => toggleSubtype(mbti, e, s);
+                        tr.appendChild(td);
+                    });
+                });
+                subBody.appendChild(tr);
+            });
+
+            // Render Fix Matrix
+            const fixBody = document.getElementById('fix-matrix-body');
+            fixBody.innerHTML = '';
+            MBTI_TYPES.forEach(mbti => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td class="mbti-label">${mbti}</td>`;
+                ENNEAGRAMS.forEach(e => {
+                    const isAllowed = fixConstraints[mbti].includes(e);
+                    const td = document.createElement('td');
+                    td.className = `constraint-cell ${isAllowed ? 'allowed' : 'forbidden'}`;
+                    td.onclick = () => toggleFix(mbti, e);
+                    tr.appendChild(td);
+                });
+                fixBody.appendChild(tr);
+            });
+        }
+
+        function toggleEnnea(mbti, e) {
+            const idx = enneaConstraints[mbti].indexOf(e);
+            if (idx > -1) enneaConstraints[mbti].splice(idx, 1);
+            else enneaConstraints[mbti].push(e);
+            render();
+        }
+
+        function toggleSubtype(mbti, e, s) {
+            if (!enneaConstraints[mbti].includes(e)) {
+                alert(`Enable Enneagram ${e} for ${mbti} first in the core matrix.`);
+                return;
+            }
+            if (!subtypeConstraints[mbti][e]) subtypeConstraints[mbti][e] = [];
+            const idx = subtypeConstraints[mbti][e].indexOf(s);
+            if (idx > -1) subtypeConstraints[mbti][e].splice(idx, 1);
+            else subtypeConstraints[mbti][e].push(s);
+            render();
+        }
+
+        function toggleFix(mbti, e) {
+            const idx = fixConstraints[mbti].indexOf(e);
+            if (idx > -1) fixConstraints[mbti].splice(idx, 1);
+            else fixConstraints[mbti].push(e);
+            render();
+        }
+
+        function saveAll() {
+            localStorage.setItem('tournament_ennea_map', JSON.stringify(enneaConstraints));
+            localStorage.setItem('tournament_subtype_map', JSON.stringify(subtypeConstraints));
+            localStorage.setItem('tournament_fix_map', JSON.stringify(fixConstraints));
+            alert("Neural Blueprint Saved! Tournament engine is now calibrated.");
+        }
+
+        function resetAll() {
+            if (confirm("Reset all tournament laws to factory defaults?")) {
+                localStorage.removeItem('tournament_ennea_map');
+                localStorage.removeItem('tournament_subtype_map');
+                localStorage.removeItem('tournament_fix_map');
+                location.reload();
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

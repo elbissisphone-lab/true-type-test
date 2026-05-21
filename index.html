@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>True Type Test | Select Language</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="../mbti.css">
+    <style>
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .logo-main {
+            width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 15px var(--primary));
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            letter-spacing: 6px;
+            margin-bottom: 25px;
+            color: #fff;
+        }
+
+        .tagline {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: var(--primary);
+            letter-spacing: 2px;
+            margin-bottom: 50px;
+            opacity: 0.8;
+        }
+
+        .language-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .lang-card {
+            background: var(--darker);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: var(--light);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .lang-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 255, 157, 0.1);
+        }
+
+        .flag-img {
+            width: 80px;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .lang-card:hover .flag-img {
+            box-shadow: 0 0 15px var(--primary);
+            border-color: var(--primary);
+        }
+
+        .lang-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .lang-native {
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .language-grid { grid-template-columns: 1fr 1fr; gap: 15px; }
+            .lang-card { padding: 15px; }
+            .flag-img { width: 60px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="True Type Test Logo" class="logo-main">
+        <h1>TRUE TYPE TEST</h1>
+        <div class="tagline">SELECT YOUR LANGUAGE</div>
+
+        <div class="language-grid">
+            <a href="test-en.html" class="lang-card">
+                <img src="https://flagcdn.com/w160/us.png" alt="English" class="flag-img">
+                <span class="lang-name">ENGLISH</span>
+                <span class="lang-native">English</span>
+            </a>
+            <a href="test-ar.html" class="lang-card">
+                <img src="https://flagcdn.com/w160/sa.png" alt="Arabic" class="flag-img">
+                <span class="lang-name">ARABIC</span>
+                <span class="lang-native">العربية</span>
+            </a>
+            <a href="test-fr.html" class="lang-card">
+                <img src="https://flagcdn.com/w160/fr.png" alt="French" class="flag-img">
+                <span class="lang-name">FRENCH</span>
+                <span class="lang-native">Français</span>
+            </a>
+            <a href="test-it.html" class="lang-card">
+                <img src="https://flagcdn.com/w160/it.png" alt="Italian" class="flag-img">
+                <span class="lang-name">ITALIAN</span>
+                <span class="lang-native">Italiano</span>
+            </a>
+            <a href="test-ru.html" class="lang-card">
+                <img src="https://flagcdn.com/w160/ru.png" alt="Russian" class="flag-img">
+                <span class="lang-name">RUSSIAN</span>
+                <span class="lang-native">Русский</span>
+            </a>
+            <a href="test-es.html" class="lang-card">
+                <img src="https://flagcdn.com/w160/es.png" alt="Spanish" class="flag-img">
+                <span class="lang-name">SPANISH</span>
+                <span class="lang-native">Español</span>
+            </a>
+            <a href="test-cn.html" class="lang-card">
+                <img src="https://flagcdn.com/w160/cn.png" alt="Chinese" class="flag-img">
+                <span class="lang-name">CHINESE</span>
+                <span class="lang-native">中文</span>
+            </a>
+            <a href="test-de.html" class="lang-card">
+                <img src="https://flagcdn.com/w160/de.png" alt="German" class="flag-img">
+                <span class="lang-name">GERMAN</span>
+                <span class="lang-native">Deutsch</span>
+            </a>
+            <a href="test-tr.html" class="lang-card">
+                <img src="https://flagcdn.com/w160/tr.png" alt="Turkish" class="flag-img">
+                <span class="lang-name">TURKISH</span>
+                <span class="lang-native">Türkçe</span>
+            </a>
+            <a href="test-jp.html" class="lang-card">
+                <img src="https://flagcdn.com/w160/jp.png" alt="Japanese" class="flag-img">
+                <span class="lang-name">JAPANESE</span>
+                <span class="lang-native">日本語</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>True Type Test | Результаты</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .profile-card {
+            background: var(--darker);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s, border-color 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .profile-card h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .profile-type {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            color: #fff;
+            text-shadow: 0 0 15px var(--primary);
+        }
+
+        .profile-desc {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            line-height: 1.6;
+        }
+
+        /* Cognitive Functions Grid */
+        .functions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .func-node {
+            background: rgba(255,255,255,0.03);
+            padding: 10px 5px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .func-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.6rem;
+            display: block;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .func-val {
+            font-family: 'Orbitron';
+            font-size: 0.8rem;
+            color: #fff;
+        }
+
+        /* Radar Chart SVG */
+        .radar-chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 0;
+        }
+        .triad-sector { opacity: 0.15; }
+        .radar-grid { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 1; }
+        .radar-axis { stroke: rgba(255,255,255,0.1); stroke-width: 1; }
+        .radar-label { font-family: 'Orbitron', sans-serif; font-weight: bold; }
+        .radar-area { fill: rgba(0, 255, 157, 0.2); stroke: var(--primary); stroke-width: 2; filter: drop-shadow(0 0 10px var(--primary)); }
+
+        .back-home {
+            display: inline-block;
+            margin-top: 40px;
+            padding: 12px 30px;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .back-home:hover {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .profile-grid { grid-template-columns: 1fr; }
+            .functions-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; margin-top: 50px; font-family: 'Orbitron', sans-serif; letter-spacing: 8px; font-size: 1.6rem; color: var(--primary);">ВАШ ПРОФИЛЬ ЛИЧНОСТИ</h1>
+        
+        <div class="profile-grid">
+            <!-- MBTI -->
+            <div class="profile-card">
+                <h2>Тип MBTI</h2>
+                <div id="mbti-type" class="profile-type">-</div>
+                <p class="profile-desc" id="mbti-desc"></p>
+            </div>
+
+            <!-- Instinctual Enneagram -->
+            <div class="profile-card">
+                <h2>Эннеаграмма и инстинкты</h2>
+                <div id="ennea-type" class="profile-type">-</div>
+                <p class="profile-desc" id="ennea-desc"></p>
+            </div>
+
+            <!-- Tritype -->
+            <div class="profile-card">
+                <h2>Тритип</h2>
+                <div id="tritype-type" class="profile-type">-</div>
+                <p class="profile-desc">Структурное взаимодействие ваших трех внутренних центров.</p>
+            </div>
+
+            <!-- Enneagram Web (Radar) -->
+            <div class="profile-card" style="grid-row: span 2;">
+                <h2>Анализ Эннеаграммы</h2>
+                <div class="radar-chart-container" id="radar-chart"></div>
+                <p class="profile-desc" style="margin-top: 10px;">Визуализация ваших баллов по каждому типу Эннеаграммы.</p>
+            </div>
+
+            <!-- Socionics -->
+            <div class="profile-card">
+                <h2>СОЦИОНИКА</h2>
+                <div id="socio-type" class="profile-type">-</div>
+                <p class="profile-desc" id="socio-desc"></p>
+            </div>
+
+            <!-- Temperament -->
+            <div class="profile-card">
+                <h2>ТЕМПЕРАМЕНТ</h2>
+                <div id="temp-type" class="profile-type">-</div>
+                <p class="profile-desc" id="temp-desc"></p>
+            </div>
+
+            <!-- Cognitive Functions -->
+            <div class="profile-card">
+                <h2>Когнитивные функции</h2>
+                <div class="functions-grid" id="func-grid"></div>
+            </div>
+        </div>
+
+        <div id="dt-section" style="margin-top: 80px; display: none;">
+            <h2 style="text-align: center; font-family: 'Orbitron'; font-size: 1.2rem; letter-spacing: 6px; color: var(--primary); margin-bottom: 40px;">ДОПОЛНИТЕЛЬНЫЕ ЧЕРТЫ</h2>
+            <div class="profile-grid" id="dt-grid"></div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 100px;">
+            <a href="index.html" class="back-home">ПРОЙТИ ТЕСТ ЗАНОВО</a>
+        </div>
+    </div>
+
+    <script>
+        const results = JSON.parse(localStorage.getItem('unified_results'));
+        
+        if (results) {
+            const mbti = results.mbti || '-';
+            const ennea = results.enneagram || '-';
+            const tritype = results.tritype || '-';
+            const socio = results.socionics || '-';
+            const temp = results.temperament || '-';
+            const mainInstinct = results.subtype || '';
+            const secInstinct = results.secondary_subtype || '';
+
+            document.getElementById('mbti-type').textContent = mbti;
+            document.getElementById('ennea-type').textContent = `${mainInstinct}/${secInstinct}${ennea}`;
+            document.getElementById('tritype-type').textContent = tritype;
+            document.getElementById('socio-type').textContent = socio;
+            document.getElementById('temp-type').textContent = temp;
+
+            // --- COGNITIVE FUNCTIONS ---
+            const fGrid = document.getElementById('func-grid');
+            if (results.mbti_normalized) {
+                Object.entries(results.mbti_normalized).forEach(([f, v]) => {
+                    const score = Math.round(v);
+                    let color = "#ff4444"; // Red (<40)
+                    if (score > 65) color = "#00ff9d"; // Green (>65)
+                    else if (score >= 40) color = "#ffeb3b"; // Yellow (40-65)
+
+                    fGrid.innerHTML += `
+                        <div class="func-node" style="border-bottom: 2px solid ${color}44;">
+                            <span class="func-label" style="color: var(--primary);">${f}</span>
+                            <span class="func-val" style="color: ${color}; text-shadow: 0 0 10px ${color}88;">${score}%</span>
+                        </div>`;
+                });
+            }
+
+            // --- ENNEAGRAM RADAR ---
+            renderEnneagramWeb(results);
+
+            // --- DESCRIPTIONS ---
+            const descriptions = {
+                mbti: {
+                    'INTJ': 'Архитектор - Стратегические мыслители с планом на любой случай.',
+                    'ENTJ': 'Командир - Смелые, находчивые и волевые лидеры.',
+                    'INFJ': 'Активист - Тихие и мистические, но очень вдохновляющие идеалисты.',
+                    'INTP': 'Ученый - Инновационные изобретатели с неутолимой жаждой знаний.',
+                    'ENTP': 'Полемист - Умные и любознательные мыслители, которые не могут устоять перед интеллектуальным вызовом.',
+                    'ENFJ': 'Тренер - Харизматичные и вдохновляющие лидеры, умеющие очаровывать слушателей.',
+                    'ENFP': 'Борец - Энтузиасты, творческие и общительные свободные умы.',
+                    'ISTJ': 'Администратор - Практичные и опирающиеся на факты люди, в надежности которых нельзя сомневаться.',
+                    'ISFJ': 'Защитник - Очень преданные и теплые защитники, всегда готовые защитить своих близких.',
+                    'ESTJ': 'Менеджер - Отличные администраторы, непревзойденные в управлении делами или людьми.',
+                    'ESFJ': 'Консул - Необычайно заботливые, общительные и популярные люди, всегда готовые помочь.',
+                    'ISTP': 'Виртуоз - Смелые и практичные экспериментаторы, мастера всевозможных инструментов.',
+                    'ISFP': 'Артист - Гибкие и очаровательные художники, всегда готовые исследовать и пробовать что-то новое.',
+                    'ESTP': 'Делец - Умные, энергичные и очень восприимчивые люди, которым искренне нравится жить на грани.',
+                    'ESFP': 'Развлекатель - Спонтанные, энергичные и полные энтузиазма люди — жизнь рядом с ними никогда не бывает скучной.'
+                },
+                enneagram: {
+                    '1': 'Реформатор - Рациональный, идеалистический тип: принципиальный, целеустремленный, самоконтролируемый и перфекционист.',
+                    '2': 'Помощник - Заботливый, межличностный тип: щедрый, демонстративный, угодливый и собственнический.',
+                    '3': 'Достигатор - Прагматичный, ориентированный на успех тип: адаптируемый, выдающийся, драйвовый и заботящийся об имидже.',
+                    '4': 'Индивидуалист - Чувствительный, замкнутый тип: выразительный, драматичный, поглощенный собой и темпераментный.',
+                    '5': 'Исследователь - Интеллектуальный, церебральный тип: проницательный, инновационный, скрытный и изолированный.',
+                    '6': 'Лоялист - Приверженный, ориентированный на безопасность тип: обаятельный, ответственный, тревожный и подозрительный.',
+                    '7': 'Энтузиаст - Активный, жизнерадостный тип: спонтанный, разносторонний, жадный и разбросанный.',
+                    '8': 'Челленджер - Мощный, доминирующий тип: уверенный в себе, решительный, упрямый и склонный к конфронтации.',
+                    '9': 'Миротворец - Легкий, скромный тип: восприимчивый, успокаивающий, покладистый и смиренный.'
+                },
+                socionics: {
+                    'LII': 'Аналитик. Ценит логику, структуру и независимое мышление.',
+                    'ILI': 'Критик. Видит закономерности, будущие последствия и избегает рисков.',
+                    'EIE': 'Наставник. Эмоциональный лидер, ориентированный на социальную атмосферу и видение.',
+                    'SLE': 'Маршал. Решительный, практичный и ориентированный на немедленное воздействие.',
+                    'ILE': 'Искатель. Прирожденные инноваторы, бросающие вызов границам.',
+                    'SEI': 'Посредник. Ориентирован на физический комфорт и гармонию.',
+                    'ESE': 'Энтузиаст. Экспрессивный и общительный, ценит гармонию.',
+                    'LSI': 'Инспектор. Ценит порядок, правила и конкретные результаты.',
+                    'IEI': 'Лирик. Сосредоточен на глубоких смыслах и эмоциональном потоке.',
+                    'SEE': 'Политик. Смелый и влиятельный, ориентирован на воздействие.',
+                    'LIE': 'Предприниматель. Движим эффективностью и ориентирован на будущее.',
+                    'ESI': 'Хранитель. Принципиальный и защищающий внутренние ценности.',
+                    'LSE': 'Штирлиц (Администратор). Продуктивный, практичный и ориентированный на компетентность.',
+                    'EII': 'Гуманист. Глубоко сопереживающий и этичный.',
+                    'IEE': 'Советчик. Видит таланты и возможности.',
+                    'SLI': 'Мастер. Спокойный, эффективный и наблюдательный.'
+                },
+                temperament: {
+                    'Choleric': 'Холерик (Лидер) - Амбициозный, решительный и ориентированный на результат.',
+                    'Sanguine': 'Сангвиник (Оптимист) - Жизнерадостный, полный энтузиазма и социально активный.',
+                    'Melancholic': 'Меланхолик (Идеалист) - Стратегический, вдумчивый и принципиальный.',
+                    'Phlegmatic': 'Флегматик (Миротворец) - Спокойный, стабильный и наблюдательный.'
+                }
+            };
+
+            if (descriptions.mbti[mbti]) document.getElementById('mbti-desc').textContent = descriptions.mbti[mbti];
+            if (descriptions.enneagram[ennea]) document.getElementById('ennea-desc').textContent = descriptions.enneagram[ennea];
+            if (descriptions.socionics[socio]) document.getElementById('socio-desc').textContent = descriptions.socionics[socio];
+            if (descriptions.temperament[temp]) document.getElementById('temp-desc').textContent = descriptions.temperament[temp];
+
+            // --- DARK TRIAD SCAN ---
+            if (results.dark_triad) {
+                document.getElementById('dt-section').style.display = 'block';
+                const grid = document.getElementById('dt-grid');
+                grid.innerHTML = '';
+                Object.entries(results.dark_triad).forEach(([trait, score]) => {
+                    let status = "Маловероятно", color = "#00ff9d", traitRu = trait;
+                    if (trait === 'machiavellianism') traitRu = 'Макиавеллизм';
+                    else if (trait === 'narcissism') traitRu = 'Нарциссизм';
+                    else if (trait === 'psychopathy') traitRu = 'Психопатия';
+
+                    if (score >= 80) { status = "Очень вероятно"; color = "#ff4444"; }
+                    else if (score >= 60) { status = "Вероятно"; color = "#ff9800"; }
+                    else if (score >= 50) { status = "Возможно"; color = "#ffeb3b"; }
+                    
+                    grid.innerHTML += `
+                        <div class="profile-card" style="border-color: ${color}88;">
+                            <h2>${traitRu.toUpperCase()}</h2>
+                            <div class="profile-type" style="font-size: 1.4rem; color: ${color}; text-shadow: 0 0 10px ${color}88; margin-bottom: 5px;">${status}</div>
+                            <div style="font-family: 'Orbitron'; font-size: 1.2rem; color: ${color}; opacity: 0.9; margin-bottom: 15px;">${score}%</div>
+                            <p class="profile-desc">Наличие черты: ${status.toLowerCase()}.</p>
+                        </div>`;
+                });
+            }
+        }
+
+        function renderEnneagramWeb(results) {
+            const rawScores = results.ennea_scores_raw || {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
+            const max = Math.max(...Object.values(rawScores), 1);
+            const normalized = {};
+            [1,2,3,4,5,6,7,8,9].forEach(t => normalized[t] = ((rawScores[t] || 0) / max) * 100);
+
+            const size = 300;
+            const center = size / 2;
+            const radius = (size / 2) * 0.75;
+            const typeAngles = { 9: 0, 1: 40, 2: 80, 3: 120, 4: 160, 5: 200, 6: 240, 7: 280, 8: 320 };
+            const typeOrder = [9, 1, 2, 3, 4, 5, 6, 7, 8];
+
+            function getCoords(type, scorePercent) {
+                const angle = (typeAngles[type] * Math.PI) / 180;
+                const r = (radius * Math.max(scorePercent, 10)) / 100;
+                return { x: center + r * Math.sin(angle), y: center - r * Math.cos(angle) };
+            }
+
+            let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+            
+            const triadSectors = [{ start: 300, end: 60, color: '#4cc9f0' }, { start: 60, end: 180, color: '#f72585' }, { start: 180, end: 300, color: '#ff9e00' }];
+            triadSectors.forEach(s => {
+                const sA = (s.start * Math.PI) / 180, eA = (s.end * Math.PI) / 180;
+                const x1 = center + radius * Math.sin(sA), y1 = center - radius * Math.cos(sA);
+                const x2 = center + radius * Math.sin(eA), y2 = center - radius * Math.cos(eA);
+                svg += `<path d="M ${center},${center} L ${x1},${y1} A ${radius},${radius} 0 0 1 ${x2},${y2} Z" fill="${s.color}" class="triad-sector" />`;
+            });
+
+            [40, 70, 100].forEach(p => {
+                let path = "";
+                typeOrder.forEach((t, i) => { const c = getCoords(t, p); path += (i === 0 ? "M" : "L") + ` ${c.x},${c.y}`; });
+                svg += `<path d="${path}Z" class="radar-grid" />`;
+            });
+
+            let area = "";
+            typeOrder.forEach((t, i) => { const c = getCoords(t, normalized[t]); area += (i === 0 ? "M" : "L") + ` ${c.x},${c.y}`; });
+            svg += `<path d="${area}Z" class="radar-area" />`;
+
+            typeOrder.forEach(t => {
+                const cOuter = getCoords(t, 100), cLabel = getCoords(t, 120);
+                svg += `<line x1="${center}" y1="${center}" x2="${cOuter.x}" y2="${cOuter.y}" class="radar-axis" />`;
+                svg += `<text x="${cLabel.x}" y="${cLabel.y}" class="radar-label" text-anchor="middle" dominant-baseline="middle" fill="rgba(255,255,255,0.6)" font-size="12">${t}</text>`;
+            });
+
+            svg += `</svg>`;
+            document.getElementById('radar-chart').innerHTML = svg;
+        }
+    </script>
+</body>
+</html>
